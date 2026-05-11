@@ -542,6 +542,64 @@
             .skills-grid { grid-template-columns: 1fr; }
             .contact-box { padding: 2.5rem 1.5rem; }
         }
+        .project-card {
+         display: flex;
+         flex-direction: column;
+         height: 100%;
+         border-radius: 14px;
+         overflow: hidden;
+         background: #fff;
+         transition: 0.3s ease;
+        }
+
+        
+        
+        .project-thumb,
+        .project-thumb-placeholder {
+         width: 100%;
+         height: 200px;
+         object-fit: cover;
+         display: block;
+        }
+
+        .project-thumb-placeholder {
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         background: linear-gradient(135deg, #1f4d3a, #2e6b52);
+         color: white;
+         font-size: 28px;
+        
+        }
+
+        .project-body {
+         display: flex;
+         flex-direction: column;
+         flex-grow: 1;
+         padding: 1.2rem;
+        }
+
+         .project-link {
+          margin-top: auto;
+          font-weight: 600;
+          color: #1f4d3a;
+        }
+        .projects-grid {
+         display: grid;
+         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+         gap: 1.5rem;
+         align-items: stretch;
+        }
+        .project-thumb {
+         width: 100%;
+         aspect-ratio: 16/9;
+         object-fit: cover;        /* already there */
+         object-position: center;  /* add this */
+         display: block;           /* add this — removes inline bottom gap */
+         background: var(--mist);
+        }
+
+        
     </style>
 </head>
 
@@ -594,7 +652,7 @@
 
             <!-- Project 1 -->
             <a href="projects/urban-heat-delhi.html" class="project-card reveal">
-                <img class="project-thumb" src="assets/img/projects/delhi_uhi.png" alt="Urban Heat Island Delhi" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <img class="project-thumb" src="assets/projects/uhi_delhi_thumb.png" alt="Urban Heat Island Delhi" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div class="project-thumb-placeholder" style="display:none;"><i class="fas fa-map"></i></div>
                 <div class="project-body">
                     <div class="project-tags">
@@ -610,7 +668,8 @@
 
             <!-- Project 2 -->
             <a href="projects/western-ghats-rainfall-case-study.html" class="project-card reveal" style="transition-delay:0.1s">
-                <div class="project-thumb-placeholder"><i class="fas fa-cloud-rain"></i></div>
+                <img class="project-thumb" src="assets/projects/western_ghats_thumb.png" alt="Urban Heat Island Delhi" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="project-thumb-placeholder" style="display:none;"><i class="fas fa-cloud-rain"></i></div>
                 <div class="project-body">
                     <div class="project-tags">
                         <span class="project-tag">CMIP6</span>
