@@ -199,6 +199,16 @@
         /* REVEAL */
         .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
         .reveal.visible { opacity: 1; transform: none; }
+
+
+        .figures-section .figure-block img {
+         max-width: 100%; /* Ensures they don't overflow */
+         width: 400px;    /* Sets a specific, smaller width (adjust as needed) */
+         height: auto;    /* Maintains aspect ratio */
+         display: block;  /* Removes bottom whitespace */
+         margin: 0 auto 10px auto; /* Centers the image */
+        }
+
     </style>
 </head>
 <body>
@@ -235,12 +245,21 @@
     <div class="block reveal">
         <p class="block-label">Overview</p>
         <h2>Executive Summary</h2>
+        <!-- Executive Summary -->
+
+
         <p>
-            Delhi's rapid urban expansion has intensified the Urban Heat Island (UHI) effect, increasing surface temperatures and reducing vegetation cover. This project quantifies spatial thermal intensification and evaluates its relationship with vegetation decline using multi-year satellite data.
+            Rapid urbanization in Delhi has altered land surface characteristics, influencing thermal patterns and vegetation distribution. This study analyzes multi-temporal Landsat 8 imagery (2015–2024) to assess spatial variability in Land Surface Temperature (LST) and vegetation dynamics using NDVI.
         </p>
+
         <p>
-            The analysis demonstrates a clear inverse relationship between greenness and heat — with the densest built-up districts recording the highest land surface temperatures and sharpest NDVI declines over the study period.
+            Results indicate a consistent rise in surface temperatures across districts alongside persistently low and slightly declining NDVI values. While a negative relationship between vegetation and temperature is observed, the correlation weakens over time, suggesting that urban heat patterns are increasingly influenced by factors beyond vegetation alone, including built-up density and material characteristics.
         </p>
+
+        <p>
+            Spatial statistical analysis reveals weak clustering of high temperatures at the district scale, highlighting the diffuse nature of urban heat in Delhi and the limitations of coarse spatial aggregation. These findings emphasize the need for finer-resolution analysis to better capture localized urban heat dynamics.
+        </p>
+
     </div>
 
     <!-- Problem -->
@@ -275,29 +294,42 @@
         <div class="workflow-steps">
             <div class="workflow-step">
                 <div class="step-num">1</div>
-                <p class="step-text">Preprocessing and quality filtering of Landsat 8 imagery — cloud masking and band selection</p>
+                <p class="step-text">Acquisition of multi-temporal Landsat 8 imagery (2015–2024), including mosaicking of multiple scenes (2017, 2019) to ensure complete spatial coverage of Delhi.</p>
             </div>
             <div class="workflow-step">
                 <div class="step-num">2</div>
-                <p class="step-text">Computation of NDVI and LST rasters using thermal infrared and near-infrared bands</p>
+                <p class="step-text">Preprocessing involving cloud filtering, band selection and application of radiometric scaling factors to convert raw digital numbers into physically meaningful reflectance and temperature values.</p>
             </div>
             <div class="workflow-step">
                 <div class="step-num">3</div>
-                <p class="step-text">Raster clipping to Delhi administrative boundary shapefile</p>
+                <p class="step-text">Derivation of NDVI from red and near-infrared bands, and Land Surface Temperature (LST) from thermal infrared band (ST_B10), followed by conversion to degrees Celsius.</p>
             </div>
             <div class="workflow-step">
                 <div class="step-num">4</div>
-                <p class="step-text">Zonal statistics aggregated at the district level for comparative analysis</p>
+                <p class="step-text">Spatial clipping of all rasters to Delhi’s administrative boundary to maintain consistent spatial extent across years.</p>
             </div>
             <div class="workflow-step">
                 <div class="step-num">5</div>
-                <p class="step-text">Multi-year trend analysis to detect temporal intensification patterns</p>
+                <p class="step-text">Zonal statistics computation at the district level to extract mean NDVI and LST values, followed by structured storage in a GeoPackage for multi-year analysis.</p>
             </div>
             <div class="workflow-step">
                 <div class="step-num">6</div>
-                <p class="step-text">NDVI–LST correlation assessment using Pearson and spatial regression methods</p>
+                <p class="step-text">Ground-referenced validation using OpenStreetMap basemap and QGIS Identify Tool to cross-check NDVI and LST values against real-world land cover features (e.g., built-up areas, vegetation, water bodies).</p>
+            </div>
+            <div class="workflow-step">
+                <div class="step-num">7</div>
+                <p class="step-text">Temporal trend analysis to evaluate inter-annual changes in vegetation and surface temperature across districts.</p>
+            </div>
+            <div class="workflow-step">
+            <div class="step-num">8</div>
+            <p class="step-text">Statistical analysis in Python (GeoPandas, Seaborn), including Pearson correlation and regression-based visualization to assess NDVI–LST relationships.</p>
+            </div>
+            <div class="workflow-step">
+            <div class="step-num">9</div>
+            <p class="step-text">Spatial statistical analysis using Global Moran’s I and Local Getis-Ord Gi* to evaluate spatial autocorrelation and identify potential clustering of thermal patterns.</p>
             </div>
         </div>
+
     </div>
 
     <!-- Findings -->
@@ -306,16 +338,16 @@
         <h2>Key Findings</h2>
         <div class="findings-grid">
             <div class="finding-card">
-                <p>Central Delhi shows the highest surface temperature intensification across the study period.</p>
+                <p>District-level analysis reveals a consistent increase in land surface temperatures (LST) over time, with several districts exhibiting rises of ~9–13°C between 2015 and 2024.</p>
             </div>
             <div class="finding-card">
-                <p>Peripheral districts demonstrate stronger vegetation resilience, with higher NDVI values persisting.</p>
+                <p>NDVI values remain relatively low and show slight declines across multiple districts, indicating limited vegetation presence and gradual greenness loss in urban areas.</p>
             </div>
             <div class="finding-card">
-                <p>A clear inverse relationship between NDVI and LST is observed — lower greenness correlates with higher temperatures.</p>
+                <p>A generally negative relationship between NDVI and LST is observed across years; however, the correlation weakens significantly by 2024, suggesting that vegetation alone does not fully explain urban heat patterns.</p>
             </div>
             <div class="finding-card">
-                <p>Thermal hotspots spatially align with dense built-up areas, confirming the UHI signature.</p>
+                <p>Spatial autocorrelation analysis (Moran’s I ≈ 0.22, p ≈ 0.051) indicates weak clustering of high temperatures, implying that urban heat is spatially dispersed rather than concentrated at the district scale.</p>
             </div>
         </div>
     </div>
@@ -329,20 +361,20 @@
 
         <div class="figure-block reveal">
             <p class="figure-label">Figure 1 — Land Surface Temperature</p>
-            <img src="../assets/img/lst_map.png" alt="Land Surface Temperature Map — Delhi">
+            <img src="../assets2/uhi_delhi/lst_map.png" alt="Land Surface Temperature Map — Delhi">
             <p class="figure-caption">LST distribution across Delhi, showing thermal intensification concentrated in central and south-west districts coinciding with high built-up density.</p>
         </div>
 
         <div class="figure-block reveal">
             <p class="figure-label">Figure 2 — NDVI Distribution</p>
-            <img src="../assets/img/ndvi_map.png" alt="NDVI Distribution — Delhi">
+            <img src="../assets2/uhi_delhi/ndvi_map.png" alt="NDVI Distribution — Delhi">
             <p class="figure-caption">Normalized Difference Vegetation Index across Delhi, highlighting pockets of vegetation resilience in peripheral and green-belt zones.</p>
         </div>
 
         <div class="figure-block reveal">
             <p class="figure-label">Figure 3 — NDVI vs LST Correlation</p>
-            <img src="../assets/img/correlation_plot.png" alt="NDVI vs LST Correlation Plot">
-            <p class="figure-caption">Scatter and regression analysis confirming the inverse NDVI–LST relationship. Districts with lower vegetation cover record significantly higher surface temperatures.</p>
+            <img src="../assets2/uhi_delhi/correlation_plot.png" alt="NDVI vs LST Correlation Plot">
+            <p class="figure-caption">Scatter and regression analysis </p>
         </div>
     </div>
 </section>
