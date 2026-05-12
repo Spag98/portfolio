@@ -1,0 +1,218 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .article-wrap {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 300;
+    color: var(--color-text-primary);
+    max-width: 680px;
+    padding: 0 0 48px 0;
+    line-height: 1.8;
+  }
+
+  .kicker {
+    font-family: 'Source Serif 4', serif;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .kicker::before {
+    content: '';
+    display: inline-block;
+    width: 28px;
+    height: 1.5px;
+    background: #C04828;
+    flex-shrink: 0;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+    margin-bottom: 20px;
+  }
+
+  .deck {
+    font-family: 'Source Serif 4', serif;
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--color-text-secondary);
+    margin-bottom: 28px;
+    border-left: 3px solid #C04828;
+    padding-left: 18px;
+  }
+
+  .byline-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 0;
+    border-top: 1px solid var(--color-border-tertiary);
+    border-bottom: 1px solid var(--color-border-tertiary);
+    margin-bottom: 32px;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    font-family: 'Source Serif 4', serif;
+    letter-spacing: 0.04em;
+  }
+  .byline-bar span + span::before {
+    content: '·';
+    margin-right: 16px;
+    opacity: 0.5;
+  }
+
+  .pull-stat {
+    float: right;
+    width: 220px;
+    margin: 4px 0 24px 28px;
+    padding: 18px 18px 14px;
+    border-top: 2.5px solid #C04828;
+    background: var(--color-background-secondary);
+  }
+  .pull-stat .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px;
+    font-weight: 700;
+    color: #C04828;
+    line-height: 1;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .pull-stat .label {
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+    font-family: 'Source Serif 4', serif;
+  }
+
+  .pull-quote {
+    margin: 36px 0;
+    padding: 0 0 0 22px;
+    border-left: 3px solid var(--color-border-secondary);
+  }
+  .pull-quote p {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-style: italic;
+    line-height: 1.55;
+    color: var(--color-text-primary);
+    font-weight: 400;
+  }
+
+  p {
+    font-size: 16.5px;
+    margin-bottom: 22px;
+    color: var(--color-text-primary);
+  }
+
+  p:first-of-type::first-letter {
+    font-family: 'Playfair Display', serif;
+    font-size: 58px;
+    font-weight: 700;
+    float: left;
+    line-height: 0.82;
+    margin: 6px 8px 0 0;
+    color: #C04828;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 36px 0 14px;
+    padding-top: 32px;
+    border-top: 1px solid var(--color-border-tertiary);
+  }
+
+  .tag-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-border-tertiary);
+  }
+  .tag {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid var(--color-border-secondary);
+    color: var(--color-text-secondary);
+    font-family: 'Source Serif 4', serif;
+  }
+  .tag.hot { border-color: #C04828; color: #C04828; }
+
+  @media (max-width: 480px) {
+    .pull-stat { float: none; width: 100%; margin: 0 0 24px; }
+  }
+</style>
+
+<div class="article-wrap">
+  <div class="kicker">Environmental Justice in Tech</div>
+
+  <h1>The Hidden Cost of the Cloud: Who Pays When Data Centres Move In?</h1>
+
+  <p class="deck">The infrastructure powering our digital lives runs on water — billions of litres of it. The communities that lose that water rarely profit from the servers that consume it.</p>
+
+  <div class="byline-bar">
+    <span>Environmental Justice</span>
+    <span>April 2026</span>
+    <span>7 min read</span>
+  </div>
+
+  <p>Somewhere in the high desert of Arizona, where temperatures regularly crack 40°C and rivers have been legally over-allocated for decades, a data centre quietly drinks. Not metaphorically — literally. The servers that store our photographs, stream our films, and train the artificial intelligence tools we use every day are cooled by water, and they are thirsty in ways that most of their users never consider.</p>
+
+  <div class="pull-stat">
+    <span class="num">~6.4bn</span>
+    <span class="label">litres of water consumed daily by US data centres — roughly equivalent to 10 average-sized cities</span>
+  </div>
+
+  <p>Data centres are not simply electricity problems. They are land problems, planning problems, and — above all — water problems. A single hyperscale facility can consume millions of litres per day to keep its processors from overheating. That water is often drawn from aquifers and river systems already under strain, in regions where Indigenous communities, farmworkers, and low-income households hold the most precarious rights to what's left.</p>
+
+  <h2>Thirst in the desert</h2>
+
+  <p>The American Southwest has become a data centre boomland precisely because of its cheap land, available tax incentives, and historically low energy costs. The irony is that it is also one of the most water-stressed regions on the planet. The Colorado River — the lifeblood of seven states and multiple tribal nations — reached its lowest recorded levels in recent years. Yet approvals for new data facilities continue at pace, with each project adding new draws on an already exhausted system.</p>
+
+  <div class="pull-quote">
+    <p>"When a tech campus moves in and gets preferential water allocations, the implicit message to local communities is: your agriculture, your wells, your way of life — these are negotiable. Their cloud storage is not."</p>
+  </div>
+
+  <p>The communities most exposed are rarely those who negotiated the contracts. Navajo Nation residents, for instance, have historically lacked access to running water in many areas — a crisis that predates the data centre boom but is sharpened by it. When scarce public water infrastructure is diverted or stressed by industrial-scale cooling operations, the argument that "everyone benefits from the internet" starts to collapse under scrutiny.</p>
+
+  <h2>Land as leverage</h2>
+
+  <p>Water is only part of the picture. The physical footprint of a modern hyperscale campus — often spanning hundreds of acres — carries its own displacement logic. In rural Virginia, a county that once prided itself on agricultural heritage has been transformed over two decades into the world's densest concentration of data infrastructure. Land values rose, but so did costs for long-term residents. Small farmers sold or were priced out. The tax base shifted, but public services did not always follow.</p>
+
+  <p>In the Global South, the pattern can be starker still. Data centre investment is growing rapidly in countries like South Africa, Nigeria, and India — and with it, the same pressures: large land acquisitions in peri-urban zones, water consumption in drought-prone areas, and a governance vacuum that allows corporations to negotiate terms that would face much tougher scrutiny in Europe or North America.</p>
+
+  <h2>Who gets to ask the questions?</h2>
+
+  <p>Environmental justice is not only about outcomes — it is about process. The communities most likely to bear the physical costs of data infrastructure are consistently the least likely to have a seat at the table when planning decisions are made. Environmental impact assessments, where they exist at all, rarely model cumulative water stress across a region; they assess individual facilities in isolation. This suits developers. It does not serve communities.</p>
+
+  <p>Some jurisdictions are beginning to push back. The Dutch government placed a temporary moratorium on new data centres near Amsterdam in 2022, citing water and energy pressure. Ireland has wrestled with similar constraints. These are signs that the laissez-faire approach to digital infrastructure siting is not inevitable — but they remain exceptions in a global industry that has largely regulated itself.</p>
+
+  <p>The servers need to be somewhere. That is not the argument. The argument is about who decides where, what information communities are entitled to before that decision is made, and what obligations a company assumes when it draws on shared resources in exchange for private profit. The cloud does not float above us, weightless and clean. It sits on the ground. And the ground, as ever, belongs to someone.</p>
+
+  <div class="tag-row">
+    <span class="tag hot">Water Rights</span>
+    <span class="tag hot">Data Centres</span>
+    <span class="tag">Environmental Justice</span>
+    <span class="tag">Big Tech</span>
+    <span class="tag">Climate</span>
+  </div>
+</div>

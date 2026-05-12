@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>India's Forests & Climate Zones in Transition | Shachi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A national-scale geospatial study of tree cover loss and Köppen-Geiger climate classification shifts across India's biodiversity hotspots and biogeographic zones, 1901–2100.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+
+    <style>
+        :root {
+            --earth:   #2d1b0e;
+            --bark:    #5c3d1e;
+            --canopy:  #3a6b35;
+            --leaf:    #6aab5e;
+            --sky-b:   #1e3c72;
+            --pale:    #eef4e8;
+            --cream:   #f8f5f0;
+            --ink:     #1a1208;
+            --mid:     #5a4a38;
+            --border:  rgba(90,61,30,0.12);
+            --serif:   'DM Serif Display', Georgia, serif;
+            --sans:    'DM Sans', system-ui, sans-serif;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--sans);
+            background: var(--cream);
+            color: var(--ink);
+            line-height: 1.8;
+        }
+
+        /* ── NAV ── */
+        .top-nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            height: 56px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 2rem;
+            background: rgba(45,27,14,0.96);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .top-nav a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; }
+        .top-nav a:hover { color: #fff; }
+        .top-nav .back { display: flex; align-items: center; gap: 8px; }
+        .top-nav .brand { font-family: var(--serif); font-size: 1.1rem; color: #fff; }
+
+        /* ── HERO ── */
+        .hero {
+            min-height: 78vh;
+            display: flex; align-items: flex-end;
+            padding: 120px 2rem 70px;
+            position: relative; overflow: hidden;
+            background: var(--earth);
+        }
+
+        /* layered atmospheric background */
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 70% 30%, rgba(58,107,53,0.35) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 20% 80%, rgba(30,60,114,0.25) 0%, transparent 55%),
+                radial-gradient(ellipse 100% 100% at 50% 0%, rgba(92,61,30,0.4) 0%, transparent 70%);
+        }
+        /* subtle grid texture */
+        .hero::after {
+            content: '';
+            position: absolute; inset: 0;
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.02) 40px),
+                repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.02) 40px);
+            pointer-events: none;
+        }
+
+        .hero-inner { position: relative; z-index: 2; max-width: 860px; }
+
+        .hero-breadcrumb {
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.15em;
+            text-transform: uppercase; color: var(--leaf); margin-bottom: 1.25rem;
+        }
+        .hero-breadcrumb a { color: inherit; text-decoration: none; }
+        .hero-breadcrumb a:hover { text-decoration: underline; }
+
+        .hero h1 {
+            font-family: var(--serif);
+            font-size: clamp(2.2rem, 5vw, 4rem);
+            color: #fff; line-height: 1.08;
+            margin-bottom: 1.25rem;
+            letter-spacing: -0.02em;
+        }
+        .hero h1 em { font-style: italic; color: var(--leaf); }
+
+        .hero-sub {
+            font-size: 1.05rem; color: rgba(255,255,255,0.62);
+            max-width: 660px; margin-bottom: 2rem; line-height: 1.75;
+        }
+
+        .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2.5rem; }
+        .hero-tag {
+            font-size: 0.73rem; font-weight: 600; letter-spacing: 0.06em;
+            color: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 100px; padding: 5px 14px;
+        }
+
+        /* ── STATS BAR ── */
+        .stats-bar {
+            background: var(--bark);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 0;
+        }
+        .stats-inner {
+            max-width: 1060px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(4, 1fr);
+        }
+        .stat-item {
+            padding: 1.75rem 2rem;
+            border-right: 1px solid rgba(255,255,255,0.06);
+            text-align: center;
+        }
+        .stat-item:last-child { border-right: none; }
+        .stat-num {
+            font-family: var(--serif);
+            font-size: 2rem; color: var(--leaf);
+            line-height: 1; display: block; margin-bottom: 0.4rem;
+        }
+        .stat-label {
+            font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em;
+            text-transform: uppercase; color: rgba(255,255,255,0.5);
+        }
+
+        /* ── SECTIONS ── */
+        .section { padding: 90px 2rem; }
+        .section-alt { background: #fff; }
+        .section-dark { background: var(--earth); color: #fff; }
+        .container { max-width: 1060px; margin: 0 auto; }
+        .article-container { max-width: 780px; margin: 0 auto; }
+
+        .block-label {
+            font-size: 0.7rem; font-weight: 700; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--canopy); margin-bottom: 0.6rem;
+        }
+        .section-dark .block-label { color: var(--leaf); }
+
+        .section-heading {
+            font-family: var(--serif);
+            font-size: clamp(1.7rem, 3.5vw, 2.6rem);
+            color: var(--ink); line-height: 1.15; margin-bottom: 1.25rem;
+        }
+        .section-dark .section-heading { color: #fff; }
+
+        .body-text { color: var(--mid); font-size: 1rem; margin-bottom: 1.1rem; line-height: 1.85; }
+        .section-dark .body-text { color: rgba(255,255,255,0.65); }
+
+        /* section divider */
+        .sec-divider {
+            display: flex; align-items: center; gap: 1rem; margin-bottom: 3rem;
+        }
+        .sec-divider::before, .sec-divider::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+        .section-dark .sec-divider::before,
+        .section-dark .sec-divider::after { background: rgba(255,255,255,0.1); }
+        .sec-divider-icon {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: var(--pale);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--canopy); font-size: 0.8rem; flex-shrink: 0;
+        }
+        .section-dark .sec-divider-icon { background: rgba(255,255,255,0.08); color: var(--leaf); }
+
+        /* ── TWO-TRACK FRAMEWORK ── */
+        .tracks-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 1.5rem; margin-top: 2rem;
+        }
+        .track-card {
+            border-radius: 16px; padding: 2rem;
+            border: 1px solid var(--border);
+            position: relative; overflow: hidden;
+        }
+        .track-card::before {
+            content: ''; position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+        }
+        .track-card.forest::before { background: linear-gradient(90deg, var(--canopy), var(--leaf)); }
+        .track-card.climate::before { background: linear-gradient(90deg, var(--sky-b), #4a7fcc); }
+
+        .track-card.forest { background: rgba(58,107,53,0.05); }
+        .track-card.climate { background: rgba(30,60,114,0.05); }
+
+        .track-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; margin-bottom: 1.25rem;
+        }
+        .track-card.forest .track-icon { background: rgba(58,107,53,0.12); color: var(--canopy); }
+        .track-card.climate .track-icon { background: rgba(30,60,114,0.1); color: var(--sky-b); }
+
+        .track-title {
+            font-family: var(--serif); font-size: 1.2rem;
+            color: var(--ink); margin-bottom: 0.5rem;
+        }
+        .track-meta { font-size: 0.78rem; color: var(--mid); margin-bottom: 1rem; line-height: 1.6; }
+        .track-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .track-chip {
+            font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em;
+            border-radius: 6px; padding: 3px 9px;
+        }
+        .track-card.forest .track-chip { background: rgba(58,107,53,0.1); color: var(--canopy); }
+        .track-card.climate .track-chip { background: rgba(30,60,114,0.08); color: var(--sky-b); }
+
+        /* methodology note */
+        .method-note {
+            margin-top: 2rem; padding: 1.25rem 1.5rem;
+            background: var(--pale); border-radius: 12px;
+            border-left: 3px solid var(--canopy);
+        }
+        .method-note p { font-size: 0.9rem; color: var(--mid); margin: 0; line-height: 1.7; }
+        .method-note strong { color: var(--ink); }
+
+        /* ── DATA SECTION ── */
+        .data-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem; margin-top: 2rem;
+        }
+        .data-card {
+            background: #fff; border: 1px solid var(--border);
+            border-radius: 12px; padding: 1.4rem;
+        }
+        .data-card-label {
+            font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em;
+            text-transform: uppercase; color: var(--canopy); margin-bottom: 0.5rem;
+        }
+        .data-card h5 {
+            font-size: 0.95rem; font-weight: 600; color: var(--ink);
+            margin-bottom: 0.5rem; line-height: 1.3;
+        }
+        .data-card p { font-size: 0.82rem; color: var(--mid); margin: 0; line-height: 1.6; }
+
+        .limitations-box {
+            margin-top: 2rem; padding: 1.5rem;
+            background: #fff8f0; border: 1px solid rgba(92,61,30,0.15);
+            border-radius: 12px; border-left: 3px solid var(--bark);
+        }
+        .limitations-box h6 {
+            font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em;
+            text-transform: uppercase; color: var(--bark); margin-bottom: 0.75rem;
+        }
+        .limitations-box ul { padding-left: 1.25rem; }
+        .limitations-box li { font-size: 0.88rem; color: var(--mid); margin-bottom: 0.4rem; line-height: 1.6; }
+
+        /* ── FINDING CARDS ── */
+        .findings-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem; margin-top: 1.5rem;
+        }
+        .finding-card {
+            border-radius: 12px; padding: 1.25rem 1.25rem 1.25rem 1rem;
+            border-left: 3px solid;
+        }
+        .finding-card.green {
+            background: rgba(106,171,94,0.08); border-color: var(--canopy);
+        }
+        .finding-card.blue {
+            background: rgba(30,60,114,0.07); border-color: var(--sky-b);
+        }
+        .finding-card p { font-size: 0.9rem; color: var(--ink); margin: 0; line-height: 1.6; font-weight: 500; }
+        .finding-card .finding-num {
+            font-family: var(--serif); font-size: 1.5rem;
+            display: block; margin-bottom: 0.4rem;
+        }
+        .finding-card.green .finding-num { color: var(--canopy); }
+        .finding-card.blue .finding-num { color: var(--sky-b); }
+
+        /* ── SYNTHESIS CARDS ── */
+        .synthesis-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem; margin-top: 2rem;
+        }
+        .synthesis-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px; padding: 1.5rem;
+        }
+        .synthesis-card h5 {
+            font-family: var(--serif); font-size: 1.1rem;
+            color: #fff; margin-bottom: 0.75rem;
+        }
+        .synthesis-card p { font-size: 0.88rem; color: rgba(255,255,255,0.62); margin: 0; line-height: 1.7; }
+        .synthesis-card .sc-icon {
+            font-size: 1.3rem; margin-bottom: 0.9rem; display: block;
+        }
+        .synthesis-card.red .sc-icon { color: #f87171; }
+        .synthesis-card.amber .sc-icon { color: #fbbf24; }
+        .synthesis-card.green .sc-icon { color: var(--leaf); }
+
+        /* ── SDG SECTION ── */
+        .sdg-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem; margin-top: 2rem;
+        }
+        .sdg-card {
+            border-radius: 12px; padding: 1.25rem;
+            display: flex; align-items: flex-start; gap: 1rem;
+        }
+        .sdg-num {
+            flex-shrink: 0;
+            width: 44px; height: 44px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.9rem; color: #fff;
+        }
+        .sdg-13 .sdg-num { background: #3f7e44; }
+        .sdg-15 .sdg-num { background: #56c02b; }
+        .sdg-6  .sdg-num  { background: #26bde2; }
+        .sdg-2  .sdg-num  { background: #dda63a; }
+        .sdg-11 .sdg-num  { background: #fd9d24; }
+        .sdg-card h6 { font-size: 0.82rem; font-weight: 700; color: var(--ink); margin-bottom: 0.25rem; }
+        .sdg-card p  { font-size: 0.78rem; color: var(--mid); margin: 0; line-height: 1.55; }
+        .sdg-13 { background: rgba(63,126,68,0.06); }
+        .sdg-15 { background: rgba(86,192,43,0.06); }
+        .sdg-6  { background: rgba(38,189,226,0.06); }
+        .sdg-2  { background: rgba(221,166,58,0.06); }
+        .sdg-11 { background: rgba(253,157,36,0.06); }
+
+        /* ── TOOLS CHIPS ── */
+        .tools-grid {
+            display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1.5rem;
+        }
+        .tool-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 0.82rem; font-weight: 500;
+            background: var(--pale); color: var(--ink);
+            border: 1px solid var(--border);
+            border-radius: 8px; padding: 6px 14px;
+        }
+        .tool-chip i { color: var(--canopy); font-size: 0.75rem; }
+
+        /* ── FIGURES ── */
+        .figures-section { background: #fff; padding: 80px 2rem; }
+        .figures-inner { max-width: 960px; margin: 0 auto; }
+        .figures-inner h2 {
+            font-family: var(--serif);
+            font-size: clamp(1.5rem, 3vw, 2.2rem);
+            margin-bottom: 0.5rem;
+        }
+        .figures-inner .sub {
+            color: var(--mid); font-size: 0.95rem; margin-bottom: 3rem;
+        }
+
+        .fig-group { margin-bottom: 5rem; }
+        .fig-group-title {
+            font-family: var(--serif); font-size: 1.3rem;
+            color: var(--ink); margin-bottom: 0.4rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--pale);
+        }
+        .fig-group-sub { font-size: 0.85rem; color: var(--mid); margin-bottom: 2rem; }
+
+        .figure-block { margin-bottom: 3.5rem; }
+        .figure-label {
+            font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em;
+            text-transform: uppercase; color: var(--canopy); margin-bottom: 0.6rem;
+        }
+
+        /* iframe embed */
+        .iframe-wrap {
+            position: relative; width: 100%; height: 520px;
+            border-radius: 12px; overflow: hidden;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.08);
+            background: #eef4e8;
+        }
+        .iframe-wrap.chart { height: 440px; }
+        .iframe-wrap iframe {
+            width: 100%; height: 100%; border: none; display: block;
+        }
+
+        /* static image */
+        .figure-block img {
+            width: 100%; border-radius: 12px;
+            box-shadow: 0 12px 36px rgba(0,0,0,0.08);
+            display: block;
+        }
+        .figure-block img.gif {
+            max-width: 720px; margin: 0 auto; display: block;
+        }
+        .figure-caption {
+            margin-top: 0.9rem; font-size: 0.875rem;
+            color: var(--mid); line-height: 1.65; font-style: italic;
+        }
+
+        /* ── PULL QUOTE ── */
+        .pull-quote {
+            border-left: 3px solid var(--leaf);
+            padding: 1rem 1.5rem; margin: 2.5rem 0;
+            background: rgba(106,171,94,0.07);
+            border-radius: 0 10px 10px 0;
+        }
+        .pull-quote p {
+            font-family: var(--serif); font-size: 1.15rem;
+            color: var(--earth); font-style: italic; margin: 0; line-height: 1.6;
+        }
+
+        /* ── FOOTER ── */
+        .project-footer {
+            background: var(--ink); padding: 2.5rem 2rem; text-align: center;
+        }
+        .project-footer a {
+            display: inline-flex; align-items: center; gap: 8px; color: #fff;
+            background: var(--canopy); padding: 12px 28px; border-radius: 100px;
+            font-weight: 600; font-size: 0.875rem; text-decoration: none;
+            transition: background 0.2s; margin: 0.5rem;
+        }
+        .project-footer a:hover { background: var(--leaf); color: #fff; }
+        .project-footer a.ghost {
+            background: transparent; border: 2px solid rgba(255,255,255,0.3);
+        }
+        .project-footer a.ghost:hover { border-color: #fff; }
+
+        /* ── REVEAL ── */
+        .reveal {
+            opacity: 0; transform: translateY(26px);
+            transition: opacity 0.65s ease, transform 0.65s ease;
+        }
+        .reveal.visible { opacity: 1; transform: none; }
+
+        @media (max-width: 768px) {
+            .stats-inner { grid-template-columns: repeat(2, 1fr); }
+            .stat-item:nth-child(2) { border-right: none; }
+            .tracks-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 520px) {
+            .stats-inner { grid-template-columns: 1fr 1fr; }
+            .iframe-wrap { height: 380px; }
+            .iframe-wrap.chart { height: 320px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="top-nav">
+    <a href="../index.html" class="back"><i class="fas fa-arrow-left"></i> All projects</a>
+    <a href="../index.html" class="brand">Shachi</a>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+    <div class="hero-inner">
+        <p class="hero-breadcrumb">
+            <a href="../index.html">Portfolio</a> / India Climate &amp; Ecological Change
+        </p>
+        <h1>India's <em>Forests</em> &amp; Climate Zones<br>in Transition</h1>
+        <p class="hero-sub">
+            A national-scale geospatial study quantifying tree cover loss and Köppen-Geiger
+            climate classification shifts across India's biodiversity hotspots and
+            biogeographic zones — from 1901 to 2100.
+        </p>
+        <div class="hero-tags">
+            <span class="hero-tag">Global Forest Watch</span>
+            <span class="hero-tag">Köppen-Geiger · CMIP6</span>
+            <span class="hero-tag">GeoPandas · Folium · Plotly</span>
+            <span class="hero-tag">Biodiversity Hotspots</span>
+            <span class="hero-tag">Biogeographic Zones</span>
+            <span class="hero-tag">SDG 13 · SDG 15</span>
+        </div>
+    </div>
+</header>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+    <div class="stats-inner">
+        <div class="stat-item">
+            <span class="stat-num">120</span>
+            <span class="stat-label">Years of data (1901–2100)</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num">4</span>
+            <span class="stat-label">Biodiversity hotspots</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num">23</span>
+            <span class="stat-label">Years of forest loss data</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num">2</span>
+            <span class="stat-label">Emission scenarios (A1FI, B1)</span>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 1: THE PROBLEM -->
+<section class="section section-alt">
+    <div class="article-container">
+        <p class="block-label">Context</p>
+        <h2 class="section-heading">Two Simultaneous Threats to India's Ecosystems</h2>
+        <div class="sec-divider"><div class="sec-divider-icon"><i class="fas fa-leaf"></i></div></div>
+
+        <p class="body-text reveal">
+            India contains four of the world's 36 biodiversity hotspots — the Himalaya,
+            Indo-Burma, Western Ghats &amp; Sri Lanka, and Sundaland — regions that together
+            hold thousands of endemic species found nowhere else on Earth. Yet these same
+            regions face two mounting, simultaneous pressures: forests being cleared from
+            the ground up, and the climatic conditions that sustain those forests shifting
+            beneath them.
+        </p>
+        <p class="body-text reveal">
+            Most analyses treat deforestation and climate change as separate problems.
+            This project asks both questions at once — <em>how much forest have India's
+            biodiversity hotspots lost between 2001 and 2023, and how are the climate
+            identities of those same regions transforming from 1901 to 2100?</em>
+            Together, these two lenses reveal a pattern of ecological pressure that
+            neither dataset alone can show.
+        </p>
+
+        <div class="pull-quote reveal">
+            <p>"The Indo-Burma hotspot faces the worst combination — highest tree cover loss
+            and a near-complete replacement of its dominant climate zone by 2100."</p>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 2: ANALYTICAL FRAMEWORK -->
+<section class="section">
+    <div class="container">
+        <p class="block-label">Analytical Framework</p>
+        <h2 class="section-heading">Two Analyses, One Question</h2>
+        <div class="sec-divider"><div class="sec-divider-icon"><i class="fas fa-sitemap"></i></div></div>
+
+        <div class="tracks-grid reveal">
+            <div class="track-card forest">
+                <div class="track-icon"><i class="fas fa-tree"></i></div>
+                <h3 class="track-title">Track 1 — Tree Cover Loss</h3>
+                <p class="track-meta">
+                    <strong>Period:</strong> 2001–2023 &nbsp;·&nbsp;
+                    <strong>Source:</strong> Global Forest Watch<br>
+                    <strong>Scale:</strong> State-level + Biodiversity hotspot<br>
+                    <strong>Thresholds:</strong> 7 canopy density levels (0% → 75%)
+                </p>
+                <div class="track-chips">
+                    <span class="track-chip">Choropleth mapping</span>
+                    <span class="track-chip">Animated bar charts</span>
+                    <span class="track-chip">Threshold comparison</span>
+                    <span class="track-chip">Temporal trends</span>
+                </div>
+            </div>
+
+            <div class="track-card climate">
+                <div class="track-icon"><i class="fas fa-cloud-sun"></i></div>
+                <h3 class="track-title">Track 2 — Climate Zone Shifts</h3>
+                <p class="track-meta">
+                    <strong>Period:</strong> 1901–2100 &nbsp;·&nbsp;
+                    <strong>Source:</strong> Köppen-Geiger / CMIP6<br>
+                    <strong>Scale:</strong> Biogeographic zones + Biodiversity hotspots<br>
+                    <strong>Scenarios:</strong> Historical, A1FI (high), B1 (low)
+                </p>
+                <div class="track-chips">
+                    <span class="track-chip">Spatial overlay</span>
+                    <span class="track-chip">Area time-series</span>
+                    <span class="track-chip">Transition matrix</span>
+                    <span class="track-chip">Scenario comparison</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="method-note reveal">
+            <p>
+                <strong>Key methodological choice:</strong> Spatial intersections used
+                <code>gpd.overlay(..., how='intersection')</code> rather than a spatial
+                join — ensuring hotspot areas were clipped precisely to India's boundary
+                rather than including geometry that spills across neighbouring countries.
+                All area calculations were performed after reprojecting to an equal-area
+                CRS (EPSG:6933) for accuracy.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 3: DATA -->
+<section class="section section-alt">
+    <div class="container">
+        <p class="block-label">Data Sources</p>
+        <h2 class="section-heading">Datasets &amp; Geographic Scope</h2>
+        <div class="sec-divider"><div class="sec-divider-icon"><i class="fas fa-database"></i></div></div>
+
+        <div class="data-grid">
+            <div class="data-card reveal">
+                <p class="data-card-label">Forest Loss</p>
+                <h5>Global Forest Watch</h5>
+                <p>Annual tree cover loss CSV, 2001–2023, at 7 canopy thresholds (0%–75%). Subnational state-level units for India.</p>
+            </div>
+            <div class="data-card reveal" style="transition-delay:0.07s">
+                <p class="data-card-label">Climate Classification</p>
+                <h5>Köppen-Geiger GeoJSON</h5>
+                <p>Historical (1901–2000) and projected (2001–2100) climate zone polygons under A1FI and B1 scenarios. Rubel &amp; Kottek dataset.</p>
+            </div>
+            <div class="data-card reveal" style="transition-delay:0.14s">
+                <p class="data-card-label">Administrative Boundaries</p>
+                <h5>India State Boundaries</h5>
+                <p>OpenStreetMap vector data. Pre-2019 boundaries — does not reflect Ladakh/J&amp;K reorganisation. Does not affect core analysis.</p>
+            </div>
+            <div class="data-card reveal" style="transition-delay:0.21s">
+                <p class="data-card-label">Ecological Zones</p>
+                <h5>Biodiversity Hotspot Polygons</h5>
+                <p>Zenodo / Myers et al. 2000 — global-scale polygons for the four hotspots intersecting India. Clipped to Indian territory.</p>
+            </div>
+            <div class="data-card reveal" style="transition-delay:0.28s">
+                <p class="data-card-label">Ecological Zones</p>
+                <h5>Biogeographic Zones</h5>
+                <p>Wildlife Institute of India — 10 biogeographic zones used for climate zone disaggregation and regional comparison.</p>
+            </div>
+            <div class="data-card reveal" style="transition-delay:0.35s">
+                <p class="data-card-label">Reference Layer</p>
+                <h5>Protected Areas</h5>
+                <p>National Parks and Wildlife Sanctuaries polygons — used to assess protected area density within each biodiversity hotspot.</p>
+            </div>
+        </div>
+
+        <div class="limitations-box reveal">
+            <h6><i class="fas fa-exclamation-triangle"></i> &nbsp;Data Limitations</h6>
+            <ul>
+                <li>Hotspot polygons are globally generalised — coarse boundaries cause overestimation in small territories like Dadra &amp; Nagar Haveli (excluded from analysis).</li>
+                <li>Bihar shows ~4% hotspot overlap due to polygon generalisation — not ecologically valid; excluded from biodiversity hotspot state analysis.</li>
+                <li>Tree cover loss data includes both natural forests and plantations — interpretation should account for regional land-use context.</li>
+                <li>Forest baseline is fixed at year 2000; post-2000 gains are not factored into loss percentages.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 4: TREE COVER FINDINGS -->
+<section class="section">
+    <div class="container">
+        <p class="block-label">Analysis — Part 1</p>
+        <h2 class="section-heading">Forest Loss Across Biodiversity Hotspots (2001–2023)</h2>
+        <div class="sec-divider"><div class="sec-divider-icon"><i class="fas fa-tree"></i></div></div>
+
+        <div class="findings-grid">
+            <div class="finding-card green reveal">
+                <span class="finding-num">80.9%</span>
+                <p>Of Arunachal Pradesh's total forest loss came from dense forest (≥75% canopy) — meaning core, ecologically irreplaceable habitat is being destroyed, not just forest edges.</p>
+            </div>
+            <div class="finding-card green reveal" style="transition-delay:0.08s">
+                <span class="finding-num">16.45%</span>
+                <p>Cumulative forest loss in Mizoram by 2023 relative to its year-2000 baseline — the highest among Northeastern states, driven by a surge between 2011 and 2017.</p>
+            </div>
+            <div class="finding-card green reveal" style="transition-delay:0.16s">
+                <span class="finding-num">Indo-Burma</span>
+                <p>Highest cumulative and annual tree loss of all four hotspots, dominated by Mizoram, Nagaland, Tripura, and Manipur. Under the greatest anthropogenic pressure.</p>
+            </div>
+            <div class="finding-card green reveal" style="transition-delay:0.24s">
+                <span class="finding-num">Sikkim</span>
+                <p>Consistently lowest tree loss despite similar terrain. Strict regulations, a non-bailable offense for illegal felling, and citizen programs like "Ten Minutes to Earth" make the difference.</p>
+            </div>
+        </div>
+
+        <div class="method-note reveal" style="margin-top:2rem;">
+            <p>
+                <strong>On canopy thresholds:</strong> The 10% threshold aligns with India's Forest Survey of India (FSI)
+                definition and captures all forest types including open woodlands. The 75% threshold isolates
+                dense, ecologically rich forest cores. Comparing both reveals not just <em>how much</em>
+                forest is lost, but <em>what quality</em> of forest — a critical distinction for
+                biodiversity assessment.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- FIGURES: TREE COVER -->
+<section class="figures-section">
+    <div class="figures-inner">
+        <h2>Tree Cover Loss — Outputs</h2>
+        <p class="sub">Interactive maps and animated charts. Pan, zoom, and hover to explore.</p>
+
+        <!-- Folium: biodiversity hotspots map -->
+        <div class="fig-group">
+            <h3 class="fig-group-title">Spatial Maps</h3>
+            <p class="fig-group-sub">Interactive Folium maps — zoom and hover for regional detail</p>
+
+            <div class="figure-block reveal">
+                <p class="figure-label">Figure 1 — Biodiversity Hotspots &amp; Protected Areas</p>
+                <div class="iframe-wrap">
+                    <iframe
+                        src="../assets2/india_climate/biodiversity_hotspots_protected_areas_in_India.html"
+                        title="Biodiversity Hotspots and Protected Areas in India"
+                        sandbox="allow-scripts allow-same-origin"
+                        loading="lazy">
+                    </iframe>
+                </div>
+                <p class="figure-caption">
+                    Folium map showing the four biodiversity hotspots and India's protected area network
+                    (national parks and wildlife sanctuaries). The Western Ghats leads with 13.67% protected
+                    area density; Indo-Burma trails at under 3%.
+                </p>
+            </div>
+
+            <div class="figure-block reveal">
+                <p class="figure-label">Figure 2 — % Tree Cover Loss in Biodiversity Hotspot States (10% Threshold)</p>
+                <div class="iframe-wrap">
+                    <iframe
+                        src="../assets2/india_climate/tree_loss_biodiversity_map.html"
+                        title="Tree cover loss in biodiversity hotspot states"
+                        sandbox="allow-scripts allow-same-origin"
+                        loading="lazy">
+                    </iframe>
+                </div>
+                <p class="figure-caption">
+                    Choropleth map of percentage tree cover loss (2001–2023) at the 10% canopy threshold
+                    across biodiversity hotspot states. Darker shades indicate greater proportional loss.
+                    Hover over states for exact figures.
+                </p>
+            </div>
+        </div>
+
+        <!-- Animated charts -->
+        <div class="fig-group">
+            <h3 class="fig-group-title">Animated Bar Charts</h3>
+            <p class="fig-group-sub">Plotly animations — press play to view year-by-year progression</p>
+
+            <div class="figure-block reveal">
+                <p class="figure-label">Figure 3 — Annual Tree Cover Loss per Biodiversity Hotspot (2001–2023)</p>
+                <div class="iframe-wrap chart">
+                    <iframe
+                        src="../assets2/india_climate/Annual_Tree_Cover_Loss_per_Biodiversity_Hotspots_animation.html"
+                        title="Animated tree cover loss by biodiversity hotspot"
+                        sandbox="allow-scripts allow-same-origin"
+                        loading="lazy">
+                    </iframe>
+                </div>
+                <p class="figure-caption">
+                    Year-by-year tree cover loss (hectares) across India's four biodiversity hotspots.
+                    Indo-Burma dominates consistently. Note the regional surge in 2016–2018 visible
+                    across all hotspots.
+                </p>
+            </div>
+
+            <div class="figure-block reveal">
+                <p class="figure-label">Figure 4 — Annual Tree Cover Loss by State (Hotspot States)</p>
+                <div class="iframe-wrap chart">
+                    <iframe
+                        src="../assets2/india_climate/tree_cover_loss_animation.html"
+                        title="Animated tree cover loss by state"
+                        sandbox="allow-scripts allow-same-origin"
+                        loading="lazy">
+                    </iframe>
+                </div>
+                <p class="figure-caption">
+                    State-level animated view. Watch how Mizoram's loss spikes sharply around 2017
+                    before declining — coinciding with the timeline of the State Action Plan on
+                    Climate Change (SAPCC).
+                </p>
+            </div>
+        </div>
+
+        <!-- Static comparisons -->
+        <div class="fig-group">
+            <h3 class="fig-group-title">Static Comparisons</h3>
+
+            <div class="figure-block reveal">
+                <p class="figure-label">Figure 5 — Tree Loss by State (10% Canopy Threshold)</p>
+                <img src="../assets2/india_climate/compare_tree_loss_10_by_state.png"
+                     alt="Tree cover loss comparison across Indian states at 10% threshold">
+                <p class="figure-caption">
+                    State-wise total tree cover loss at the 10% threshold (2001–2023).
+                    Northeast states dominate — Assam leads at ~331,646 ha total loss,
+                    followed by Mizoram and Arunachal Pradesh.
+                </p>
+            </div>
+
+            <div class="figure-block reveal">
+                <p class="figure-label">Figure 6 — Dense vs Sparse Forest Loss: 15% vs 75% Threshold</p>
+                <img src="../assets2/india_climate/compare_tree_loss_15_75.png"
+                     alt="Tree cover loss comparison at 15% vs 75% canopy threshold">
+                <p class="figure-caption">
+                    Comparing loss at 15% (includes open woodlands) vs 75% (dense forest cores) reveals
+                    the quality of deforestation. Arunachal Pradesh loses 80.9% of its 15%-threshold
+                    loss from dense forest — a critical conservation signal.
+                </p>
+            </div>
+
+            <div class="figure-block reveal">
+                <p class="figure-label">Figure 7 — Temporal Trends in Northeastern States (10% Threshold)</p>
+                <img src="../assets2/india_climate/line_plot_tree_loss_10_northeast.png"
+                     alt="Line plot of tree cover loss trends in northeastern states">
+                <p class="figure-caption">
+                    Annual loss trends (2001–2023) for seven Northeastern states. All states peak between
+                    2016–2018. Sikkim's consistently flat line is the clearest evidence that effective
+                    policy can interrupt regional deforestation trends.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 5: CLIMATE ZONE FINDINGS -->
+<section class="section section-alt">
+    <div class="container">
+        <p class="block-label">Analysis — Part 2</p>
+        <h2 class="section-heading">Climate Zone Transitions Across India (1901–2100)</h2>
+        <div class="sec-divider"><div class="sec-divider-icon"><i class="fas fa-cloud-sun"></i></div></div>
+
+        <div class="findings-grid">
+            <div class="finding-card blue reveal">
+                <span class="finding-num">−282,000 km²</span>
+                <p>Area of humid subtropical climate (Cwa) lost in the Gangetic Plain by 2100 under A1FI — replaced by tropical savanna (Aw). One of India's most populous agricultural belts faces a fundamental climate identity shift.</p>
+            </div>
+            <div class="finding-card blue reveal" style="transition-delay:0.08s">
+                <span class="finding-num">Dfc → 0</span>
+                <p>The Trans-Himalayan subarctic climate class (Dfc) disappears entirely by 2100 under A1FI, replaced by dry-summer variants. Glacier retreat, snow loss, and altitudinal warming are the driving signals.</p>
+            </div>
+            <div class="finding-card blue reveal" style="transition-delay:0.16s">
+                <span class="finding-num">+313,015 km²</span>
+                <p>BSh (hot semi-arid) expansion by 2100 — gaining land from Aw and As. Combined with BWh desert growth, this signals increasing aridity across the Deccan Plateau and western India.</p>
+            </div>
+            <div class="finding-card blue reveal" style="transition-delay:0.24s">
+                <span class="finding-num">Am — stable</span>
+                <p>Tropical monsoon climate (Am) retains nearly 100% of its area — concentrated in Western Ghats, Northeast, and Andaman Islands. Ocean-buffered and orographic systems show the greatest climate resilience.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FIGURES: CLIMATE -->
+<section class="figures-section" style="background: var(--cream);">
+    <div class="figures-inner">
+        <h2>Climate Zone Shifts — Outputs</h2>
+        <p class="sub">Historical analysis (1901–2000) and future projections (2001–2100) under A1FI and B1 scenarios.</p>
+
+        <div class="fig-group">
+            <h3 class="fig-group-title">Historical Climate Change (1901–2000)</h3>
+
+            <div class="figure-block reveal">
+                <p class="figure-label">Figure 8 — Climate Class Area Change (1901–2000)</p>
+                <img src="../assets2/india_climate/climate_class_area_change_historical_data.png"
+                     alt="Climate class area change in India 1901–2000">
+                <p class="figure-caption">
+                    Net area change per Köppen-Geiger climate class across the 20th century.
+                    Cwa (humid subtropical) lost the most — over 202,000 km² — while Aw (tropical savanna)
+                    gained 129,000 km². A baseline shift that preceded the high-emission era.
+                </p>
+            </div>
+        </div>
+
+        <div class="fig-group">
+            <h3 class="fig-group-title">Projected Shifts — Gangetic Plain (Animated)</h3>
+
+            <div class="figure-block reveal">
+                <p class="figure-label">Figure 9 — Climate Zone Animation: Gangetic Plain (1901–2100)</p>
+                <img src="../assets2/india_climate/climate_zone_animation.gif"
+                     class="gif"
+                     alt="Animated climate zone change in Gangetic Plains">
+                <p class="figure-caption">
+                    Animated bar chart showing how each climate class' area in the Gangetic Plain
+                    evolves from 1901 to 2100. The collapse of Cwa and rise of Aw is the dominant
+                    signal — a region feeding hundreds of millions transitioning toward savanna conditions.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 6: SYNTHESIS -->
+<section class="section section-dark">
+    <div class="container">
+        <p class="block-label">Key Insight</p>
+        <h2 class="section-heading">The Double Squeeze on Biodiversity Hotspots</h2>
+        <div class="sec-divider"><div class="sec-divider-icon"><i class="fas fa-compress-arrows-alt"></i></div></div>
+
+        <p class="body-text reveal" style="max-width:720px;">
+            Viewing both analyses together reveals a pattern that neither alone could show.
+            India's biodiversity hotspots are not just losing forest cover — they are
+            simultaneously losing the climatic conditions that allowed those forests to exist.
+        </p>
+
+        <div class="synthesis-grid">
+            <div class="synthesis-card red reveal">
+                <span class="sc-icon"><i class="fas fa-fire"></i></span>
+                <h5>Indo-Burma — Highest Combined Pressure</h5>
+                <p>Leads in both cumulative tree cover loss and climate zone replacement. Cwa collapses by ~57,000 km² while deforestation rates remain the highest of all hotspots. These pressures reinforce each other — cleared land absorbs more heat, accelerating local climate shifts.</p>
+            </div>
+            <div class="synthesis-card amber reveal" style="transition-delay:0.1s">
+                <span class="sc-icon"><i class="fas fa-mountain"></i></span>
+                <h5>Himalaya — Climate Shift Without Forest Loss</h5>
+                <p>Moderate forest loss but dramatic altitudinal climate zone shifts. Dfc disappears entirely; Cwb transitions toward Cwa at elevation. The ecological risk here is habitat compression — species adapted to cold zones have nowhere to migrate upward.</p>
+            </div>
+            <div class="synthesis-card green reveal" style="transition-delay:0.2s">
+                <span class="sc-icon"><i class="fas fa-shield-alt"></i></span>
+                <h5>Western Ghats — Most Stable, Still at Risk</h5>
+                <p>Am climate zone shows the highest retention (~100%). Forest loss is present but lower than Northeast states. However, measurable Aw expansion toward the end of century signals that stability is conditional — not guaranteed under continued high emissions.</p>
+            </div>
+        </div>
+
+        <div class="pull-quote reveal" style="border-color: var(--leaf); background: rgba(106,171,94,0.08); margin-top:3rem;">
+            <p style="color:#e8f4e4;">"Sikkim's resilience — low forest loss despite being surrounded by high-loss states — is the clearest evidence in this dataset that policy intervention can interrupt even regional deforestation trends."</p>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 7: SDG -->
+<section class="section section-alt">
+    <div class="container">
+        <p class="block-label">Policy Relevance</p>
+        <h2 class="section-heading">Sustainable Development Goal Linkages</h2>
+        <div class="sec-divider"><div class="sec-divider-icon"><i class="fas fa-globe"></i></div></div>
+
+        <div class="sdg-grid">
+            <div class="sdg-card sdg-13 reveal">
+                <div class="sdg-num">13</div>
+                <div>
+                    <h6>Climate Action</h6>
+                    <p>Climate zone transition matrices provide spatially grounded evidence for adaptation planning. Identifies where climate regimes are shifting fastest.</p>
+                </div>
+            </div>
+            <div class="sdg-card sdg-15 reveal" style="transition-delay:0.07s">
+                <div class="sdg-num">15</div>
+                <div>
+                    <h6>Life on Land</h6>
+                    <p>Direct quantification of forest loss in biodiversity hotspots. Identifies conservation gaps — Indo-Burma hotspot protected area coverage under 3%.</p>
+                </div>
+            </div>
+            <div class="sdg-card sdg-6 reveal" style="transition-delay:0.14s">
+                <div class="sdg-num">6</div>
+                <div>
+                    <h6>Clean Water</h6>
+                    <p>Forest loss in the Gangetic Plain and Himalaya directly threatens watershed regulation for river systems supplying hundreds of millions of people.</p>
+                </div>
+            </div>
+            <div class="sdg-card sdg-2 reveal" style="transition-delay:0.21s">
+                <div class="sdg-num">2</div>
+                <div>
+                    <h6>Zero Hunger</h6>
+                    <p>The Cwa → Aw climate shift in the Gangetic Plain has direct implications for agricultural suitability in India's primary food-producing belt.</p>
+                </div>
+            </div>
+            <div class="sdg-card sdg-11 reveal" style="transition-delay:0.28s">
+                <div class="sdg-num">11</div>
+                <div>
+                    <h6>Sustainable Cities</h6>
+                    <p>Tracks climate-driven land cover shifts near urban hotspots — relevant for climate-resilient urban planning in rapidly expanding cities.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 8: TOOLS -->
+<section class="section">
+    <div class="container">
+        <p class="block-label">Tools &amp; Techniques</p>
+        <h2 class="section-heading">Methods Summary</h2>
+        <div class="sec-divider"><div class="sec-divider-icon"><i class="fas fa-code"></i></div></div>
+
+        <div class="tools-grid reveal">
+            <span class="tool-chip"><i class="fas fa-check"></i> GeoPandas</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Folium</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Plotly</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Pandas · NumPy</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Matplotlib · Seaborn</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Shapely</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> gpd.overlay() intersection</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Equal-area reprojection (EPSG:6933)</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Köppen-Geiger classification</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Climate transition matrix</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Animated visualisation (Plotly)</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Zonal statistics</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Canopy threshold analysis</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Scenario comparison (A1FI vs B1)</span>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<div class="project-footer">
+    <a href="https://github.com/Spag98" target="_blank">
+        <i class="fab fa-github"></i> View Code on GitHub
+    </a>
+    <a href="../index.html" class="ghost">
+        <i class="fas fa-arrow-left"></i> Back to Portfolio
+    </a>
+</div>
+
+<script>
+    const els = document.querySelectorAll('.reveal');
+    const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('visible');
+                obs.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.08 });
+    els.forEach(el => obs.observe(el));
+</script>
+
+</body>
+</html>
