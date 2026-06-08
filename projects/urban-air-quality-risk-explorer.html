@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Urban Air Quality Risk Explorer — India | Shachi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="End-to-end air quality analytics pipeline analysing PM2.5, PM10, and NO2 across 10 major Indian cities with NAAQS compliance assessment, spatial risk mapping, and an interactive Streamlit dashboard.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+
+    <style>
+        :root {
+            --steel:   #0f2236;
+            --navy:    #1a3a5c;
+            --air:     #2d7dd2;
+            --haze:    #5ba4e0;
+            --pale:    #e8f3fc;
+            --cream:   #f7f9fc;
+            --ink:     #0d1b2a;
+            --mid:     #3d5a73;
+            --border:  rgba(45,125,210,0.12);
+            --warn:    #e05c2d;
+            --safe:    #2db87a;
+            --serif:   'DM Serif Display', Georgia, serif;
+            --sans:    'DM Sans', system-ui, sans-serif;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--sans); background: var(--cream); color: var(--ink); line-height: 1.8; }
+
+        /* ── NAV ── */
+        .top-nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            height: 56px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 2rem;
+            background: rgba(15,34,54,0.96);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .top-nav a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; }
+        .top-nav a:hover { color: #fff; }
+        .top-nav .back { display: flex; align-items: center; gap: 8px; }
+        .top-nav .brand { font-family: var(--serif); font-size: 1.1rem; color: #fff; }
+
+        /* ── HERO ── */
+        .hero {
+            min-height: 78vh; display: flex; align-items: flex-end;
+            padding: 120px 2rem 70px;
+            position: relative; overflow: hidden;
+            background: var(--steel);
+        }
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 70% 60% at 75% 25%, rgba(45,125,210,0.3) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 50% at 15% 75%, rgba(224,92,45,0.15) 0%, transparent 55%),
+                radial-gradient(ellipse 90% 80% at 50% 0%, rgba(26,58,92,0.5) 0%, transparent 70%);
+        }
+        .hero::after {
+            content: ''; position: absolute; inset: 0;
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.018) 40px),
+                repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.018) 40px);
+            pointer-events: none;
+        }
+        .hero-inner { position: relative; z-index: 2; max-width: 860px; }
+
+        .hero-breadcrumb { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--haze); margin-bottom: 1.25rem; }
+        .hero-breadcrumb a { color: inherit; text-decoration: none; }
+        .hero-breadcrumb a:hover { text-decoration: underline; }
+
+        .hero h1 { font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 4rem); color: #fff; line-height: 1.08; margin-bottom: 1.25rem; letter-spacing: -0.02em; }
+        .hero h1 em { font-style: italic; color: var(--haze); }
+
+        .hero-sub { font-size: 1.05rem; color: rgba(255,255,255,0.62); max-width: 660px; margin-bottom: 2rem; line-height: 1.75; }
+
+        .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2.5rem; }
+        .hero-tag { font-size: 0.73rem; font-weight: 600; letter-spacing: 0.06em; color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); border-radius: 100px; padding: 5px 14px; }
+
+        .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+        .hero-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 12px 24px; border-radius: 100px;
+            font-weight: 600; font-size: 0.875rem; text-decoration: none;
+            transition: all 0.2s; letter-spacing: 0.02em;
+        }
+        .hero-btn-primary { background: var(--air); color: #fff; border: 2px solid var(--air); }
+        .hero-btn-primary:hover { background: var(--haze); border-color: var(--haze); color: #fff; }
+        .hero-btn-ghost { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.3); }
+        .hero-btn-ghost:hover { border-color: #fff; color: #fff; }
+
+        /* ── STATS BAR ── */
+        .stats-bar { background: var(--navy); border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .stats-inner { max-width: 1060px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
+        .stat-item { padding: 1.6rem 1.5rem; border-right: 1px solid rgba(255,255,255,0.06); text-align: center; }
+        .stat-item:last-child { border-right: none; }
+        .stat-num { font-family: var(--serif); font-size: 1.8rem; color: var(--haze); line-height: 1; display: block; margin-bottom: 0.35rem; }
+        .stat-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+
+        /* ── SECTIONS ── */
+        .section { padding: 90px 2rem; }
+        .section-alt { background: #fff; }
+        .section-dark { background: var(--steel); color: #fff; }
+        .container { max-width: 1060px; margin: 0 auto; }
+        .article-container { max-width: 780px; margin: 0 auto; }
+
+        .block-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--air); margin-bottom: 0.6rem; }
+        .section-dark .block-label { color: var(--haze); }
+
+        .section-heading { font-family: var(--serif); font-size: clamp(1.7rem, 3.5vw, 2.6rem); color: var(--ink); line-height: 1.15; margin-bottom: 1.25rem; }
+        .section-dark .section-heading { color: #fff; }
+
+        .body-text { color: var(--mid); font-size: 1rem; margin-bottom: 1.1rem; line-height: 1.85; }
+        .section-dark .body-text { color: rgba(255,255,255,0.62); }
+
+        .sec-divider { display: flex; align-items: center; gap: 1rem; margin-bottom: 3rem; }
+        .sec-divider::before, .sec-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        .section-dark .sec-divider::before, .section-dark .sec-divider::after { background: rgba(255,255,255,0.1); }
+        .sec-divider-icon { width: 34px; height: 34px; border-radius: 50%; background: var(--pale); display: flex; align-items: center; justify-content: center; color: var(--air); font-size: 0.8rem; flex-shrink: 0; }
+        .section-dark .sec-divider-icon { background: rgba(255,255,255,0.08); color: var(--haze); }
+
+        /* ── PHASE PIPELINE ── */
+        .pipeline { display: flex; flex-direction: column; gap: 0; margin-top: 2rem; }
+        .phase-item {
+            display: flex; gap: 1.5rem; align-items: flex-start;
+            padding: 1.5rem 0; border-bottom: 1px solid var(--border);
+        }
+        .phase-item:last-child { border-bottom: none; }
+        .phase-num {
+            flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%;
+            background: var(--navy); color: var(--haze);
+            font-weight: 700; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center;
+            margin-top: 2px; border: 2px solid rgba(45,125,210,0.3);
+        }
+        .phase-content { flex: 1; }
+        .phase-title { font-weight: 700; font-size: 0.95rem; color: var(--ink); margin-bottom: 0.4rem; }
+        .phase-title span { color: var(--air); font-family: var(--serif); font-size: 1rem; margin-right: 6px; }
+        .phase-desc { font-size: 0.88rem; color: var(--mid); line-height: 1.7; margin-bottom: 0.6rem; }
+        .phase-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .phase-chip { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; background: var(--pale); color: var(--navy); border-radius: 6px; padding: 3px 9px; }
+
+        /* ── FINDINGS ── */
+        .findings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+        .finding-card { border-radius: 12px; padding: 1.25rem 1.25rem 1.25rem 1rem; border-left: 3px solid; }
+        .finding-card.red { background: rgba(224,92,45,0.07); border-color: var(--warn); }
+        .finding-card.blue { background: rgba(45,125,210,0.07); border-color: var(--air); }
+        .finding-card.green { background: rgba(45,184,122,0.07); border-color: var(--safe); }
+        .finding-card .finding-num { font-family: var(--serif); font-size: 1.6rem; display: block; margin-bottom: 0.35rem; }
+        .finding-card.red .finding-num { color: var(--warn); }
+        .finding-card.blue .finding-num { color: var(--air); }
+        .finding-card.green .finding-num { color: var(--safe); }
+        .finding-card p { font-size: 0.88rem; color: var(--ink); margin: 0; line-height: 1.6; font-weight: 500; }
+
+        /* ── RISK TABLE ── */
+        .risk-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; font-size: 0.875rem; }
+        .risk-table th { padding: 0.75rem 1rem; text-align: left; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--air); border-bottom: 2px solid var(--border); }
+        .risk-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); color: var(--mid); vertical-align: middle; }
+        .risk-table tr:last-child td { border-bottom: none; }
+        .risk-table .city-name { font-weight: 600; color: var(--ink); }
+        .risk-badge { display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 10px; border-radius: 100px; }
+        .risk-critical { background: rgba(224,92,45,0.12); color: #c0391a; }
+        .risk-high { background: rgba(251,167,36,0.15); color: #b07000; }
+        .risk-moderate { background: rgba(45,125,210,0.1); color: #1a5fa0; }
+        .risk-low { background: rgba(45,184,122,0.1); color: #1a8a55; }
+
+        /* ── FORMULA BOX ── */
+        .formula-box {
+            background: var(--navy); border-radius: 12px; padding: 1.5rem 2rem;
+            margin-top: 1.5rem; display: inline-block; width: 100%;
+        }
+        .formula-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--haze); margin-bottom: 0.75rem; }
+        .formula-text { font-family: 'Courier New', monospace; font-size: 1rem; color: #fff; line-height: 1.6; }
+        .formula-text .weight { color: var(--haze); }
+
+        /* ── DASHBOARD PREVIEW ── */
+        .dashboard-tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; }
+        .tab-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; border-top: 3px solid var(--air); }
+        .tab-num { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--air); margin-bottom: 0.5rem; }
+        .tab-title { font-weight: 600; font-size: 0.95rem; color: var(--ink); margin-bottom: 0.4rem; }
+        .tab-desc { font-size: 0.82rem; color: var(--mid); line-height: 1.6; margin: 0; }
+
+        /* ── LIVE DASHBOARD CTA ── */
+        .dashboard-cta {
+            background: linear-gradient(135deg, var(--navy), var(--steel));
+            border-radius: 20px; padding: 3rem 2.5rem;
+            text-align: center; margin-top: 3rem;
+            border: 1px solid rgba(45,125,210,0.2);
+        }
+        .dashboard-cta h3 { font-family: var(--serif); font-size: 1.8rem; color: #fff; margin-bottom: 0.75rem; }
+        .dashboard-cta p { color: rgba(255,255,255,0.6); margin-bottom: 2rem; font-size: 0.95rem; }
+        .dashboard-cta .cta-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 14px 32px; border-radius: 100px;
+            background: var(--air); color: #fff;
+            font-weight: 700; font-size: 0.95rem; text-decoration: none;
+            transition: background 0.2s; letter-spacing: 0.02em;
+        }
+        .dashboard-cta .cta-btn:hover { background: var(--haze); color: #fff; }
+
+        /* ── TOOLS ── */
+        .tools-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1.5rem; }
+        .tool-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 500; background: var(--pale); color: var(--ink); border: 1px solid var(--border); border-radius: 8px; padding: 6px 14px; }
+        .tool-chip i { color: var(--air); font-size: 0.75rem; }
+
+        /* ── FIGURES ── */
+        .figures-section { background: #fff; padding: 80px 2rem; }
+        .figures-inner { max-width: 960px; margin: 0 auto; }
+        .figures-inner h2 { font-family: var(--serif); font-size: clamp(1.5rem, 3vw, 2.2rem); margin-bottom: 0.5rem; }
+        .figures-inner .sub { color: var(--mid); font-size: 0.95rem; margin-bottom: 3rem; }
+
+        .figure-block { margin-bottom: 3.5rem; }
+        .figure-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--air); margin-bottom: 0.6rem; }
+        .figure-block img { width: 100%; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.09); display: block; }
+        .figure-caption { margin-top: 0.9rem; font-size: 0.875rem; color: var(--mid); line-height: 1.65; font-style: italic; }
+
+        .iframe-wrap { position: relative; width: 100%; height: 520px; border-radius: 12px; overflow: hidden; box-shadow: 0 16px 48px rgba(0,0,0,0.08); background: var(--pale); }
+        .iframe-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+
+        /* ── SYNTHESIS ── */
+        .synthesis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-top: 2rem; }
+        .synthesis-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 1.5rem; }
+        .synthesis-card .sc-icon { font-size: 1.3rem; margin-bottom: 0.9rem; display: block; }
+        .synthesis-card h5 { font-family: var(--serif); font-size: 1.1rem; color: #fff; margin-bottom: 0.6rem; }
+        .synthesis-card p { font-size: 0.88rem; color: rgba(255,255,255,0.6); margin: 0; line-height: 1.7; }
+        .sc-red .sc-icon { color: #f87171; }
+        .sc-amber .sc-icon { color: #fbbf24; }
+        .sc-green .sc-icon { color: #6ee7b7; }
+
+        /* ── FOOTER ── */
+        .project-footer { background: var(--ink); padding: 2.5rem 2rem; text-align: center; }
+        .project-footer a { display: inline-flex; align-items: center; gap: 8px; color: #fff; background: var(--air); padding: 12px 28px; border-radius: 100px; font-weight: 600; font-size: 0.875rem; text-decoration: none; transition: background 0.2s; margin: 0.5rem; }
+        .project-footer a:hover { background: var(--haze); color: #fff; }
+        .project-footer a.ghost { background: transparent; border: 2px solid rgba(255,255,255,0.3); }
+        .project-footer a.ghost:hover { border-color: #fff; }
+
+        /* ── REVEAL ── */
+        .reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.65s ease, transform 0.65s ease; }
+        .reveal.visible { opacity: 1; transform: none; }
+
+        @media (max-width: 768px) {
+            .stats-inner { grid-template-columns: repeat(3, 1fr); }
+            .stat-item:nth-child(3) { border-right: none; }
+            .stat-item:nth-child(4), .stat-item:nth-child(5) { border-top: 1px solid rgba(255,255,255,0.06); }
+        }
+        @media (max-width: 500px) {
+            .stats-inner { grid-template-columns: repeat(2, 1fr); }
+            .iframe-wrap { height: 380px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="top-nav">
+    <a href="../index.html" class="back"><i class="fas fa-arrow-left"></i> All projects</a>
+    <a href="../index.html" class="brand">Shachi</a>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+    <div class="hero-inner">
+        <p class="hero-breadcrumb"><a href="../index.html">Portfolio</a> / Air Quality Risk Explorer</p>
+        <h1>Urban Air Quality<br><em>Risk Explorer</em> - India</h1>
+        <p class="hero-sub">
+            End-to-end analytics pipeline measuring PM2.5, PM10 and NO2 concentrations
+            across 10 major Indian cities - with NAAQS compliance assessment,
+            composite spatial risk mapping, and a live interactive Streamlit dashboard.
+        </p>
+        <div class="hero-tags">
+            <span class="hero-tag">OpenAQ API</span>
+            <span class="hero-tag">PM2.5 · PM10 · NO2</span>
+            <span class="hero-tag">NAAQS Compliance</span>
+            <span class="hero-tag">GeoPandas · Folium · Plotly</span>
+            <span class="hero-tag">Streamlit Dashboard</span>
+            <span class="hero-tag">Spatial Risk Index</span>
+        </div>
+        <div class="hero-ctas">
+            <a href="https://india-air-quality-risk.streamlit.app/" target="_blank" class="hero-btn hero-btn-primary">
+                <i class="fas fa-external-link-alt"></i> Live Dashboard
+            </a>
+            <a href="https://github.com/Spag98/-urban-air-quality-risk-explorer" target="_blank" class="hero-btn hero-btn-ghost">
+                <i class="fab fa-github"></i> View on GitHub
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+    <div class="stats-inner">
+        <div class="stat-item">
+            <span class="stat-num">10</span>
+            <span class="stat-label">Indian cities</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num">3</span>
+            <span class="stat-label">Pollutants tracked</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num">90</span>
+            <span class="stat-label">Days of data</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num">7/10</span>
+            <span class="stat-label">Cities exceed NAAQS</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-num">5</span>
+            <span class="stat-label">Pipeline phases</span>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 1: CONTEXT -->
+<section class="section section-alt">
+    <div class="article-container">
+        <p class="block-label">Context</p>
+        <h2 class="section-heading">Urban Air Quality in India</h2>
+        <div class="sec-divider"><div class="sec-divider-icon"><i class="fas fa-wind"></i></div></div>
+
+        <p class="body-text reveal">
+            India is home to some of the world's most polluted cities. Yet real-time, city-level
+            air quality data remains fragmented — spread across APIs, inconsistently recorded, and
+            rarely analysed in a spatially comparable format. For environmental analysts and
+            emissions consultants, the challenge is not just accessing data but building
+            reproducible pipelines that can ingest, clean, analyse and communicate pollution
+            risk across multiple cities simultaneously.
+        </p>
+        <p class="body-text reveal">
+            This project builds that pipeline end-to-end - rom raw API ingestion through
+            QA/QC, statistical analysis, spatial risk scoring and a deployed interactive dashboard.
+            
+        </p>
+    </div>
+</section>
+
+<!-- SECTION 2: METHODOLOGY -->
+<section class="section">
+    <div class="container">
+        <p class="block-label">Methodology</p>
+        <h2 class="section-heading">Five-Phase Analytics Pipeline</h2>
+        <div class="sec-divider"><div class="sec-divider-icon"><i class="fas fa-project-diagram"></i></div></div>
+
+        <div class="pipeline">
+            <div class="phase-item reveal">
+                <div class="phase-num">01</div>
+                <div class="phase-content">
+                    <p class="phase-title"><span>Data Collection</span> OpenAQ API Ingestion</p>
+                    <p class="phase-desc">Ingested 90 days of PM2.5, PM10, and NO2 data across 10 Indian cities - Delhi, Mumbai, Kolkata, Chennai, Patna, Bengaluru, Hyderabad, Ahmedabad, Lucknow and Jaipur --border via the OpenAQ API. A synthetic dataset was generated to supplement sparse API returns, incorporating realistic pollution indices and seasonal variation.</p>
+                    <div class="phase-chips">
+                        <span class="phase-chip">OpenAQ API</span>
+                        <span class="phase-chip">10 cities</span>
+                        <span class="phase-chip">PM2.5 · PM10 · NO2</span>
+                        <span class="phase-chip">Synthetic data generation</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="phase-item reveal">
+                <div class="phase-num">02</div>
+                <div class="phase-content">
+                    <p class="phase-title"><span>Data Cleaning</span> QA/QC Pipeline</p>
+                    <p class="phase-desc">Missing value audit, negative value removal and 3×IQR outlier flagging per city-parameter group. NAAQS threshold validation and exceedance rate calculation applied across all records. Output: clean_air_quality_data.csv with full traceability from raw ingestion.</p>
+                    <div class="phase-chips">
+                        <span class="phase-chip">IQR outlier detection</span>
+                        <span class="phase-chip">NAAQS validation</span>
+                        <span class="phase-chip">Exceedance rates</span>
+                        <span class="phase-chip">Data traceability</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="phase-item reveal">
+                <div class="phase-num">03</div>
+                <div class="phase-content">
+                    <p class="phase-title"><span>Statistical Analysis</span> Trend &amp; Correlation</p>
+                    <p class="phase-desc">Descriptive statistics (mean, median, std, P95, CV%) per city. Linear trend analysis - slope, R², p-value - for each city. Seasonal decomposition and Pearson correlation between PM2.5 and NO2. Key finding: Ahmedabad is the only city with a statistically significant increasing PM2.5 trend (p=0.045).</p>
+                    <div class="phase-chips">
+                        <span class="phase-chip">Linear trend (OLS)</span>
+                        <span class="phase-chip">Seasonal decomposition</span>
+                        <span class="phase-chip">Pearson correlation</span>
+                        <span class="phase-chip">P95 percentile</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="phase-item reveal">
+                <div class="phase-num">04</div>
+                <div class="phase-content">
+                    <p class="phase-title"><span>Spatial Analysis</span> Composite Risk Index</p>
+                    <p class="phase-desc">A weighted composite risk index was developed normalising each pollutant against its NAAQS limit. Cities were classified into Critical, High, Moderate and Low risk tiers. Static bubble map (Matplotlib) and interactive choropleth (Folium + Plotly) produced for spatial communication.</p>
+                    <div class="phase-chips">
+                        <span class="phase-chip">Composite risk scoring</span>
+                        <span class="phase-chip">NAAQS normalisation</span>
+                        <span class="phase-chip">Folium choropleth</span>
+                        <span class="phase-chip">Risk classification</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="phase-item reveal">
+                <div class="phase-num">05</div>
+                <div class="phase-content">
+                    <p class="phase-title"><span>Dashboard</span> Streamlit Deployment</p>
+                    <p class="phase-desc">A 4-tab interactive Streamlit dashboard with city/pollutant sidebar selector, deployed to Streamlit Community Cloud. Tabs cover spatial risk mapping, time series trends, NAAQS exceedance heatmap and per-city deep dives with pollutant boxplots.</p>
+                    <div class="phase-chips">
+                        <span class="phase-chip">Streamlit</span>
+                        <span class="phase-chip">4-tab layout</span>
+                        <span class="phase-chip">7-day rolling mean</span>
+                        <span class="phase-chip">Live deployment</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formula -->
+        <div class="formula-box reveal">
+            <p class="formula-label">Composite Risk Index Formula</p>
+            <p class="formula-text">
+                Risk Score = <span class="weight">(PM2.5 / 60) × 0.5</span>
+                + <span class="weight">(PM10 / 100) × 0.3</span>
+                + <span class="weight">(NO2 / 80) × 0.2</span>
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 3: KEY FINDINGS -->
+<section class="section section-alt">
+    <div class="container">
+        <p class="block-label">Key Findings</p>
+        <h2 class="section-heading">What the Data Shows</h2>
+        <div class="sec-divider"><div class="sec-divider-icon"><i class="fas fa-chart-bar"></i></div></div>
+
+        <div class="findings-grid">
+            <div class="finding-card red reveal">
+                <span class="finding-num">7×</span>
+                <p>Delhi PM2.5 (108.5 µg/m³) exceeds the WHO guideline — and 1.8× the NAAQS limit. Delhi PM10 exceeds NAAQS on 100% of analysed days.</p>
+            </div>
+            <div class="finding-card red reveal" style="transition-delay:0.07s">
+                <span class="finding-num">98.9%</span>
+                <p>Of days Patna's PM2.5 exceeds NAAQS - the second most polluted city in the dataset after Delhi.</p>
+            </div>
+            <div class="finding-card blue reveal" style="transition-delay:0.14s">
+                <span class="finding-num">7 / 10</span>
+                <p>Cities exceed NAAQS PM2.5 limits. North Indian cities form a clear high-risk spatial cluster, while southern cities consistently rank cleaner.</p>
+            </div>
+            <div class="finding-card blue reveal" style="transition-delay:0.21s">
+                <span class="finding-num">p = 0.045</span>
+                <p>Ahmedabad shows a statistically significant increasing PM2.5 trend - the only city in the dataset with a confirmed directional worsening signal.</p>
+            </div>
+            <div class="finding-card green reveal" style="transition-delay:0.28s">
+                <span class="finding-num">South ✓</span>
+                <p>Bengaluru, Chennai and Hyderabad consistently rank as the lowest-risk cities - a clear north–south pollution gradient visible in spatial outputs.</p>
+            </div>
+        </div>
+
+        <!-- Risk Table -->
+        <div class="reveal" style="margin-top:2.5rem; overflow-x:auto;">
+            <table class="risk-table">
+                <thead>
+                    <tr>
+                        <th>City</th>
+                        <th>PM2.5 (µg/m³)</th>
+                        <th>NAAQS Exceedance</th>
+                        <th>Risk Tier</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="city-name">Delhi</td><td>108.5</td><td>100% of days</td><td><span class="risk-badge risk-critical">Critical</span></td></tr>
+                    <tr><td class="city-name">Patna</td><td>~95</td><td>98.9% of days</td><td><span class="risk-badge risk-critical">Critical</span></td></tr>
+                    <tr><td class="city-name">Lucknow</td><td>~82</td><td>High</td><td><span class="risk-badge risk-high">High</span></td></tr>
+                    <tr><td class="city-name">Ahmedabad</td><td>~75</td><td>High + rising trend</td><td><span class="risk-badge risk-high">High</span></td></tr>
+                    <tr><td class="city-name">Kolkata</td><td>~70</td><td>Moderate–High</td><td><span class="risk-badge risk-high">High</span></td></tr>
+                    <tr><td class="city-name">Mumbai</td><td>~55</td><td>Moderate</td><td><span class="risk-badge risk-moderate">Moderate</span></td></tr>
+                    <tr><td class="city-name">Jaipur</td><td>~52</td><td>Moderate</td><td><span class="risk-badge risk-moderate">Moderate</span></td></tr>
+                    <tr><td class="city-name">Hyderabad</td><td>~38</td><td>Low</td><td><span class="risk-badge risk-low">Low</span></td></tr>
+                    <tr><td class="city-name">Chennai</td><td>~33</td><td>Low</td><td><span class="risk-badge risk-low">Low</span></td></tr>
+                    <tr><td class="city-name">Bengaluru</td><td>~30</td><td>Low</td><td><span class="risk-badge risk-low">Low</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- FIGURES -->
+<section class="figures-section">
+    <div class="figures-inner">
+        <h2>Analytical Outputs</h2>
+        <p class="sub">Static charts, spatial maps and interactive visualisations from the pipeline.</p>
+
+        <div class="figure-block reveal">
+            <p class="figure-label">Figure 1 — Statistical Analysis Overview (4-Panel)</p>
+            <img src="../assets2/air_quality/statistical_analysis.png"
+                 alt="4-panel statistical analysis chart - city PM2.5 ranking, NAAQS exceedance heatmap, seasonal boxplot, top-city time series">
+            <p class="figure-caption">
+                Four-panel summary: city PM2.5 ranking against NAAQS (top left), NAAQS exceedance
+                heatmap across all cities and pollutants (top right), seasonal variation boxplot
+                (bottom left) and time series for the four most polluted cities with 7-day rolling mean (bottom right).
+            </p>
+        </div>
+
+        <div class="figure-block reveal">
+            <p class="figure-label">Figure 2 - Spatial Risk Map</p>
+            <img src="../assets2/air_quality/spatial_risk_map.png"
+                 alt="PM2.5 bubble map and composite risk index bar chart">
+            <p class="figure-caption">
+                Left: bubble map plotting PM2.5 concentration at each city's coordinates -
+                bubble size scaled to concentration, colour coded by risk tier.
+                Right: composite risk index horizontal bar chart ranking all 10 cities.
+                The north-south pollution gradient is clearly visible.
+            </p>
+        </div>
+
+        <div class="figure-block reveal">
+            <p class="figure-label">Figure 3 - Interactive Risk Map (Folium)</p>
+            <div class="iframe-wrap">
+                <iframe
+                    src="../assets2/air_quality/interactive_risk_map.html"
+                    title="Interactive air quality risk map - India"
+                    sandbox="allow-scripts allow-same-origin"
+                    loading="lazy">
+                </iframe>
+            </div>
+            <p class="figure-caption">
+                Interactive Folium map with clickable city popups showing full pollutant breakdown
+                (PM2.5, PM10, NO2), composite risk score and risk tier classification.
+                Heatmap overlay shows pollution intensity across the geography.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 4: DASHBOARD -->
+<section class="section section-alt">
+    <div class="container">
+        <p class="block-label">Streamlit Dashboard</p>
+        <h2 class="section-heading">Live Interactive Dashboard - 4 Tabs</h2>
+        <div class="sec-divider"><div class="sec-divider-icon"><i class="fas fa-desktop"></i></div></div>
+
+        <div class="dashboard-tabs">
+            <div class="tab-card reveal">
+                <p class="tab-num">Tab 01</p>
+                <p class="tab-title">Spatial Risk Map</p>
+                <p class="tab-desc">Plotly globe view + risk ranking table. Sidebar city and pollutant selector. Visual overview of the national pollution landscape.</p>
+            </div>
+            <div class="tab-card reveal" style="transition-delay:0.08s">
+                <p class="tab-num">Tab 02</p>
+                <p class="tab-title">Time Series Trends</p>
+                <p class="tab-desc">Daily concentration trends with 7-day rolling mean overlay. Stats table showing slope, R² and p-value per city.</p>
+            </div>
+            <div class="tab-card reveal" style="transition-delay:0.16s">
+                <p class="tab-num">Tab 03</p>
+                <p class="tab-title">NAAQS Exceedance</p>
+                <p class="tab-desc">Exceedance heatmap across all cities and pollutants. Key findings cards highlighting the worst offenders.</p>
+            </div>
+            <div class="tab-card reveal" style="transition-delay:0.24s">
+                <p class="tab-num">Tab 04</p>
+                <p class="tab-title">City Deep Dive</p>
+                <p class="tab-desc">Per-city metrics panel with pollutant boxplots, seasonal breakdown and compliance summary for detailed investigation.</p>
+            </div>
+        </div>
+
+        <div class="dashboard-cta reveal">
+            <h3>Explore the live dashboard</h3>
+            <p>Fully deployed on Streamlit Community Cloud - no installation required.</p>
+            <a href="https://india-air-quality-risk.streamlit.app/" target="_blank" class="cta-btn">
+                <i class="fas fa-external-link-alt"></i> Open Dashboard
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 5: SYNTHESIS -->
+<section class="section section-dark">
+    <div class="container">
+        <p class="block-label">Synthesis</p>
+        <h2 class="section-heading">Three Patterns in the Data</h2>
+        <div class="sec-divider"><div class="sec-divider-icon"><i class="fas fa-lightbulb"></i></div></div>
+
+        <div class="synthesis-grid">
+            <div class="synthesis-card sc-red reveal">
+                <span class="sc-icon"><i class="fas fa-exclamation-circle"></i></span>
+                <h5>The North Indian Crisis</h5>
+                <p>Delhi, Patna and Lucknow form a high-risk spatial cluster where PM2.5 exceeds NAAQS on nearly every day of the year. The density of industry, transport, crop burning and urban heat creates a pollution feedback loop that seasonal variation alone cannot explain.</p>
+            </div>
+            <div class="synthesis-card sc-amber reveal" style="transition-delay:0.1s">
+                <span class="sc-icon"><i class="fas fa-chart-line"></i></span>
+                <h5>Ahmedabad - A Warning Signal</h5>
+                <p>Unlike other high-pollution cities, Ahmedabad is the only city showing a statistically significant upward PM2.5 trend (p=0.045). This is a leading indicator - a city that may transition from high to critical risk if industrial expansion and urbanisation continue without corresponding regulation.</p>
+            </div>
+            <div class="synthesis-card sc-green reveal" style="transition-delay:0.2s">
+                <span class="sc-icon"><i class="fas fa-wind"></i></span>
+                <h5>Southern Cities - A Replicable Model</h5>
+                <p>Bengaluru, Chennai and Hyderabad consistently maintain lower pollution levels despite rapid urban growth. Their coastal geography, topography and comparatively stronger local environmental governance offer a partial model for what is achievable in more vulnerable cities.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 6: TOOLS -->
+<section class="section section-alt">
+    <div class="container">
+        <p class="block-label">Tools &amp; Stack</p>
+        <h2 class="section-heading">Technical Implementation</h2>
+        <div class="sec-divider"><div class="sec-divider-icon"><i class="fas fa-code"></i></div></div>
+
+        <div class="tools-grid reveal">
+            <span class="tool-chip"><i class="fas fa-check"></i> Python</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Pandas · NumPy</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> SciPy</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> GeoPandas</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Folium</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Plotly</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Matplotlib · Seaborn</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Streamlit</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> OpenAQ API</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Google Colab</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> 3×IQR outlier detection</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> OLS trend analysis</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Composite risk indexing</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> NAAQS compliance framework</span>
+            <span class="tool-chip"><i class="fas fa-check"></i> Streamlit Community Cloud</span>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<div class="project-footer">
+    <a href="https://india-air-quality-risk.streamlit.app/" target="_blank">
+        <i class="fas fa-external-link-alt"></i> Live Dashboard
+    </a>
+    <a href="https://github.com/Spag98/-urban-air-quality-risk-explorer" target="_blank">
+        <i class="fab fa-github"></i> GitHub
+    </a>
+    <a href="../index.html" class="ghost">
+        <i class="fas fa-arrow-left"></i> Back to Portfolio
+    </a>
+</div>
+
+<script>
+    const els = document.querySelectorAll('.reveal');
+    const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+        });
+    }, { threshold: 0.08 });
+    els.forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
