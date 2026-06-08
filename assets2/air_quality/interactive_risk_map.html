@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_785ae83582b2470f937a4c555029a508 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdn.jsdelivr.net/gh/python-visualization/folium@main/folium/templates/leaflet_heat.min.js"></script>
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_785ae83582b2470f937a4c555029a508" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_785ae83582b2470f937a4c555029a508 = L.map(
+                "map_785ae83582b2470f937a4c555029a508",
+                {
+                    center: [22.0, 80.0],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 5,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_4953c8dc6afc83e94062ea48696d277b = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_4953c8dc6afc83e94062ea48696d277b.addTo(map_785ae83582b2470f937a4c555029a508);
+        
+    
+            var circle_marker_ded26ce0fee2025d0f5fbcc60b0ddad9 = L.circleMarker(
+                [28.6139, 77.209],
+                {"bubblingMouseEvents": true, "color": "#a50026", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a50026", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 24.270000000000003, "stroke": true, "weight": 3}
+            ).addTo(map_785ae83582b2470f937a4c555029a508);
+        
+    
+        var popup_0492ffe8435070af900a67b81c5efb47 = L.popup({
+  "maxWidth": 220,
+});
+
+        
+            
+                var html_76ef2c65c066a0e578ac6c1f4cd51cf6 = $(`<div id="html_76ef2c65c066a0e578ac6c1f4cd51cf6" style="width: 100.0%; height: 100.0%;">     <div style="font-family:Arial; width:200px">         <h4 style="color:#a50026; margin:0">Delhi</h4>         <hr style="margin:4px 0">         <b>Risk Category:</b> Critical<br>         <b>Risk Score:</b> 1.618<br>         <hr style="margin:4px 0">         <b>PM2.5:</b> 108.5 µg/m³             (NAAQS: 60)<br>         <b>PM10:</b>  177.4 µg/m³             (NAAQS: 100)<br>         <b>NO2:</b>   72.4 µg/m³             (NAAQS: 80)<br>     </div>     </div>`)[0];
+                popup_0492ffe8435070af900a67b81c5efb47.setContent(html_76ef2c65c066a0e578ac6c1f4cd51cf6);
+            
+        
+
+        circle_marker_ded26ce0fee2025d0f5fbcc60b0ddad9.bindPopup(popup_0492ffe8435070af900a67b81c5efb47)
+        ;
+
+        
+    
+    
+            circle_marker_ded26ce0fee2025d0f5fbcc60b0ddad9.bindTooltip(
+                `<div>
+                     Delhi — Risk: Critical
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_f50046381be89001df314ebb28db8d81 = L.circleMarker(
+                [25.5941, 85.1376],
+                {"bubblingMouseEvents": true, "color": "#f7894f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f7894f", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 21.165, "stroke": true, "weight": 3}
+            ).addTo(map_785ae83582b2470f937a4c555029a508);
+        
+    
+        var popup_246a8cbb06ef988dc1a6c94cc36c24b6 = L.popup({
+  "maxWidth": 220,
+});
+
+        
+            
+                var html_95e3e4b928d6857a19844780a635977b = $(`<div id="html_95e3e4b928d6857a19844780a635977b" style="width: 100.0%; height: 100.0%;">     <div style="font-family:Arial; width:200px">         <h4 style="color:#f7894f; margin:0">Patna</h4>         <hr style="margin:4px 0">         <b>Risk Category:</b> High<br>         <b>Risk Score:</b> 1.411<br>         <hr style="margin:4px 0">         <b>PM2.5:</b> 93.3 µg/m³             (NAAQS: 60)<br>         <b>PM10:</b>  160.0 µg/m³             (NAAQS: 100)<br>         <b>NO2:</b>   61.6 µg/m³             (NAAQS: 80)<br>     </div>     </div>`)[0];
+                popup_246a8cbb06ef988dc1a6c94cc36c24b6.setContent(html_95e3e4b928d6857a19844780a635977b);
+            
+        
+
+        circle_marker_f50046381be89001df314ebb28db8d81.bindPopup(popup_246a8cbb06ef988dc1a6c94cc36c24b6)
+        ;
+
+        
+    
+    
+            circle_marker_f50046381be89001df314ebb28db8d81.bindTooltip(
+                `<div>
+                     Patna — Risk: High
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_236f376e509a06237f99709a3f2f726c = L.circleMarker(
+                [26.8467, 80.9462],
+                {"bubblingMouseEvents": true, "color": "#fdb265", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fdb265", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 20.325, "stroke": true, "weight": 3}
+            ).addTo(map_785ae83582b2470f937a4c555029a508);
+        
+    
+        var popup_a60b9279c490fc86eb3c7730bf6424b5 = L.popup({
+  "maxWidth": 220,
+});
+
+        
+            
+                var html_22cf114d929a92744960cd3fc740b611 = $(`<div id="html_22cf114d929a92744960cd3fc740b611" style="width: 100.0%; height: 100.0%;">     <div style="font-family:Arial; width:200px">         <h4 style="color:#fdb265; margin:0">Lucknow</h4>         <hr style="margin:4px 0">         <b>Risk Category:</b> High<br>         <b>Risk Score:</b> 1.355<br>         <hr style="margin:4px 0">         <b>PM2.5:</b> 90.5 µg/m³             (NAAQS: 60)<br>         <b>PM10:</b>  151.5 µg/m³             (NAAQS: 100)<br>         <b>NO2:</b>   58.6 µg/m³             (NAAQS: 80)<br>     </div>     </div>`)[0];
+                popup_a60b9279c490fc86eb3c7730bf6424b5.setContent(html_22cf114d929a92744960cd3fc740b611);
+            
+        
+
+        circle_marker_236f376e509a06237f99709a3f2f726c.bindPopup(popup_a60b9279c490fc86eb3c7730bf6424b5)
+        ;
+
+        
+    
+    
+            circle_marker_236f376e509a06237f99709a3f2f726c.bindTooltip(
+                `<div>
+                     Lucknow — Risk: High
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6a5f384374d53e9b5cc5abf236bd9994 = L.circleMarker(
+                [22.5726, 88.3639],
+                {"bubblingMouseEvents": true, "color": "#fee391", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fee391", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 19.05, "stroke": true, "weight": 3}
+            ).addTo(map_785ae83582b2470f937a4c555029a508);
+        
+    
+        var popup_adefc6f014c8e694fadc349a367f7642 = L.popup({
+  "maxWidth": 220,
+});
+
+        
+            
+                var html_ec3c2d19cdd16c760389bc127dede72c = $(`<div id="html_ec3c2d19cdd16c760389bc127dede72c" style="width: 100.0%; height: 100.0%;">     <div style="font-family:Arial; width:200px">         <h4 style="color:#fee391; margin:0">Kolkata</h4>         <hr style="margin:4px 0">         <b>Risk Category:</b> High<br>         <b>Risk Score:</b> 1.270<br>         <hr style="margin:4px 0">         <b>PM2.5:</b> 83.1 µg/m³             (NAAQS: 60)<br>         <b>PM10:</b>  145.7 µg/m³             (NAAQS: 100)<br>         <b>NO2:</b>   56.2 µg/m³             (NAAQS: 80)<br>     </div>     </div>`)[0];
+                popup_adefc6f014c8e694fadc349a367f7642.setContent(html_ec3c2d19cdd16c760389bc127dede72c);
+            
+        
+
+        circle_marker_6a5f384374d53e9b5cc5abf236bd9994.bindPopup(popup_adefc6f014c8e694fadc349a367f7642)
+        ;
+
+        
+    
+    
+            circle_marker_6a5f384374d53e9b5cc5abf236bd9994.bindTooltip(
+                `<div>
+                     Kolkata — Risk: High
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e2a40b1dfd1ca93e71f0823abd9cd4e9 = L.circleMarker(
+                [23.0225, 72.5714],
+                {"bubblingMouseEvents": true, "color": "#f3faaf", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f3faaf", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 17.549999999999997, "stroke": true, "weight": 3}
+            ).addTo(map_785ae83582b2470f937a4c555029a508);
+        
+    
+        var popup_8f9c0f6011d74742c672de341636dcee = L.popup({
+  "maxWidth": 220,
+});
+
+        
+            
+                var html_9ce7dee00b5752625c7f29f784278a76 = $(`<div id="html_9ce7dee00b5752625c7f29f784278a76" style="width: 100.0%; height: 100.0%;">     <div style="font-family:Arial; width:200px">         <h4 style="color:#f3faaf; margin:0">Ahmedabad</h4>         <hr style="margin:4px 0">         <b>Risk Category:</b> Moderate<br>         <b>Risk Score:</b> 1.170<br>         <hr style="margin:4px 0">         <b>PM2.5:</b> 79.4 µg/m³             (NAAQS: 60)<br>         <b>PM10:</b>  126.8 µg/m³             (NAAQS: 100)<br>         <b>NO2:</b>   51.1 µg/m³             (NAAQS: 80)<br>     </div>     </div>`)[0];
+                popup_8f9c0f6011d74742c672de341636dcee.setContent(html_9ce7dee00b5752625c7f29f784278a76);
+            
+        
+
+        circle_marker_e2a40b1dfd1ca93e71f0823abd9cd4e9.bindPopup(popup_8f9c0f6011d74742c672de341636dcee)
+        ;
+
+        
+    
+    
+            circle_marker_e2a40b1dfd1ca93e71f0823abd9cd4e9.bindTooltip(
+                `<div>
+                     Ahmedabad — Risk: Moderate
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ce7a2f028a7ccb11e5c972361b9b0b28 = L.circleMarker(
+                [26.9124, 75.7873],
+                {"bubblingMouseEvents": true, "color": "#d7ee89", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d7ee89", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 16.605, "stroke": true, "weight": 3}
+            ).addTo(map_785ae83582b2470f937a4c555029a508);
+        
+    
+        var popup_601eae2556c78406defedf55eaa761f9 = L.popup({
+  "maxWidth": 220,
+});
+
+        
+            
+                var html_9dda71a1d4f43237686316347f48045a = $(`<div id="html_9dda71a1d4f43237686316347f48045a" style="width: 100.0%; height: 100.0%;">     <div style="font-family:Arial; width:200px">         <h4 style="color:#d7ee89; margin:0">Jaipur</h4>         <hr style="margin:4px 0">         <b>Risk Category:</b> Moderate<br>         <b>Risk Score:</b> 1.107<br>         <hr style="margin:4px 0">         <b>PM2.5:</b> 74.5 µg/m³             (NAAQS: 60)<br>         <b>PM10:</b>  122.4 µg/m³             (NAAQS: 100)<br>         <b>NO2:</b>   47.6 µg/m³             (NAAQS: 80)<br>     </div>     </div>`)[0];
+                popup_601eae2556c78406defedf55eaa761f9.setContent(html_9dda71a1d4f43237686316347f48045a);
+            
+        
+
+        circle_marker_ce7a2f028a7ccb11e5c972361b9b0b28.bindPopup(popup_601eae2556c78406defedf55eaa761f9)
+        ;
+
+        
+    
+    
+            circle_marker_ce7a2f028a7ccb11e5c972361b9b0b28.bindTooltip(
+                `<div>
+                     Jaipur — Risk: Moderate
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e4707342b434181bb0c8b213ff1a3eb8 = L.circleMarker(
+                [19.076, 72.8777],
+                {"bubblingMouseEvents": true, "color": "#86cb66", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#86cb66", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 14.79, "stroke": true, "weight": 3}
+            ).addTo(map_785ae83582b2470f937a4c555029a508);
+        
+    
+        var popup_e6e741e13c88307f9933fb4719b871cf = L.popup({
+  "maxWidth": 220,
+});
+
+        
+            
+                var html_f925e989fcee8ece3602aa9b39358525 = $(`<div id="html_f925e989fcee8ece3602aa9b39358525" style="width: 100.0%; height: 100.0%;">     <div style="font-family:Arial; width:200px">         <h4 style="color:#86cb66; margin:0">Mumbai</h4>         <hr style="margin:4px 0">         <b>Risk Category:</b> Low<br>         <b>Risk Score:</b> 0.986<br>         <hr style="margin:4px 0">         <b>PM2.5:</b> 64.5 µg/m³             (NAAQS: 60)<br>         <b>PM10:</b>  112.0 µg/m³             (NAAQS: 100)<br>         <b>NO2:</b>   44.8 µg/m³             (NAAQS: 80)<br>     </div>     </div>`)[0];
+                popup_e6e741e13c88307f9933fb4719b871cf.setContent(html_f925e989fcee8ece3602aa9b39358525);
+            
+        
+
+        circle_marker_e4707342b434181bb0c8b213ff1a3eb8.bindPopup(popup_e6e741e13c88307f9933fb4719b871cf)
+        ;
+
+        
+    
+    
+            circle_marker_e4707342b434181bb0c8b213ff1a3eb8.bindTooltip(
+                `<div>
+                     Mumbai — Risk: Low
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3d38cdb51cd453540c6ff63a301ab09d = L.circleMarker(
+                [17.385, 78.4867],
+                {"bubblingMouseEvents": true, "color": "#39a757", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#39a757", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 13.41, "stroke": true, "weight": 3}
+            ).addTo(map_785ae83582b2470f937a4c555029a508);
+        
+    
+        var popup_62490dbc8ff745113bcc8bd43c7c49c5 = L.popup({
+  "maxWidth": 220,
+});
+
+        
+            
+                var html_6014517ae5d904f0a406c878df36a0c9 = $(`<div id="html_6014517ae5d904f0a406c878df36a0c9" style="width: 100.0%; height: 100.0%;">     <div style="font-family:Arial; width:200px">         <h4 style="color:#39a757; margin:0">Hyderabad</h4>         <hr style="margin:4px 0">         <b>Risk Category:</b> Low<br>         <b>Risk Score:</b> 0.894<br>         <hr style="margin:4px 0">         <b>PM2.5:</b> 59.3 µg/m³             (NAAQS: 60)<br>         <b>PM10:</b>  100.7 µg/m³             (NAAQS: 100)<br>         <b>NO2:</b>   39.0 µg/m³             (NAAQS: 80)<br>     </div>     </div>`)[0];
+                popup_62490dbc8ff745113bcc8bd43c7c49c5.setContent(html_6014517ae5d904f0a406c878df36a0c9);
+            
+        
+
+        circle_marker_3d38cdb51cd453540c6ff63a301ab09d.bindPopup(popup_62490dbc8ff745113bcc8bd43c7c49c5)
+        ;
+
+        
+    
+    
+            circle_marker_3d38cdb51cd453540c6ff63a301ab09d.bindTooltip(
+                `<div>
+                     Hyderabad — Risk: Low
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b46d956b43808724d8868bfe6414906a = L.circleMarker(
+                [13.0827, 80.2707],
+                {"bubblingMouseEvents": true, "color": "#118847", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#118847", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 12.45, "stroke": true, "weight": 3}
+            ).addTo(map_785ae83582b2470f937a4c555029a508);
+        
+    
+        var popup_24f942b3f43ef6ee30dd6f01420ae827 = L.popup({
+  "maxWidth": 220,
+});
+
+        
+            
+                var html_c5abdc105c91dda39d2898ed9bfcbbb0 = $(`<div id="html_c5abdc105c91dda39d2898ed9bfcbbb0" style="width: 100.0%; height: 100.0%;">     <div style="font-family:Arial; width:200px">         <h4 style="color:#118847; margin:0">Chennai</h4>         <hr style="margin:4px 0">         <b>Risk Category:</b> Low<br>         <b>Risk Score:</b> 0.830<br>         <hr style="margin:4px 0">         <b>PM2.5:</b> 54.9 µg/m³             (NAAQS: 60)<br>         <b>PM10:</b>  95.2 µg/m³             (NAAQS: 100)<br>         <b>NO2:</b>   34.7 µg/m³             (NAAQS: 80)<br>     </div>     </div>`)[0];
+                popup_24f942b3f43ef6ee30dd6f01420ae827.setContent(html_c5abdc105c91dda39d2898ed9bfcbbb0);
+            
+        
+
+        circle_marker_b46d956b43808724d8868bfe6414906a.bindPopup(popup_24f942b3f43ef6ee30dd6f01420ae827)
+        ;
+
+        
+    
+    
+            circle_marker_b46d956b43808724d8868bfe6414906a.bindTooltip(
+                `<div>
+                     Chennai — Risk: Low
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_f6d2b4cd0f4aa9d8fb8ccf73db558927 = L.circleMarker(
+                [12.9716, 77.5946],
+                {"bubblingMouseEvents": true, "color": "#006837", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#006837", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 11.58, "stroke": true, "weight": 3}
+            ).addTo(map_785ae83582b2470f937a4c555029a508);
+        
+    
+        var popup_3a71349e3e16fd34613f37b22923e14f = L.popup({
+  "maxWidth": 220,
+});
+
+        
+            
+                var html_3fdb6336bb706d91e62e2bdc19f7e3fa = $(`<div id="html_3fdb6336bb706d91e62e2bdc19f7e3fa" style="width: 100.0%; height: 100.0%;">     <div style="font-family:Arial; width:200px">         <h4 style="color:#006837; margin:0">Bengaluru</h4>         <hr style="margin:4px 0">         <b>Risk Category:</b> Low<br>         <b>Risk Score:</b> 0.772<br>         <hr style="margin:4px 0">         <b>PM2.5:</b> 51.4 µg/m³             (NAAQS: 60)<br>         <b>PM10:</b>  86.8 µg/m³             (NAAQS: 100)<br>         <b>NO2:</b>   33.4 µg/m³             (NAAQS: 80)<br>     </div>     </div>`)[0];
+                popup_3a71349e3e16fd34613f37b22923e14f.setContent(html_3fdb6336bb706d91e62e2bdc19f7e3fa);
+            
+        
+
+        circle_marker_f6d2b4cd0f4aa9d8fb8ccf73db558927.bindPopup(popup_3a71349e3e16fd34613f37b22923e14f)
+        ;
+
+        
+    
+    
+            circle_marker_f6d2b4cd0f4aa9d8fb8ccf73db558927.bindTooltip(
+                `<div>
+                     Bengaluru — Risk: Low
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var heat_map_9eb63c07301fc02bd7a04ad82908f015 = L.heatLayer(
+                [[28.6139, 77.209, 108.53621741956223], [25.5941, 85.1376, 93.2622800948037], [26.8467, 80.9462, 90.51962070980242], [22.5726, 88.3639, 83.05852561505112], [23.0225, 72.5714, 79.38298541748556], [26.9124, 75.7873, 74.45094937072243], [19.076, 72.8777, 64.52389131589442], [17.385, 78.4867, 59.30004756178165], [13.0827, 80.2707, 54.92034384228023], [12.9716, 77.5946, 51.369436114506264]],
+                {
+  "minOpacity": 0.5,
+  "maxZoom": 18,
+  "radius": 60,
+  "blur": 40,
+  "gradient": {
+  "0.4": "green",
+  "0.6": "yellow",
+  "0.8": "orange",
+  "1.0": "red",
+},
+}
+            );
+        
+    
+            heat_map_9eb63c07301fc02bd7a04ad82908f015.addTo(map_785ae83582b2470f937a4c555029a508);
+        
+</script>
+</html>
